@@ -1,0 +1,13 @@
+Nom,SMILES
+"2,6-Dichlorobenzoyl chloride",C1=CC(=C(C(=C1)Cl)C(=O)Cl)Cl
+Cyclopropanecarbonyl chloride,C1CC1C(=O)Cl
+2-Naphthoyl Chloride,C1=CC=C2C=C(C=CC2=C1)C(=O)Cl
+Propionyl chloride,CCC(=O)Cl
+3-Bromopropionyl chloride,C(CBr)C(=O)Cl
+Phenylacetyl chloride,C1=CC=C(C=C1)CC(=O)Cl
+Acetyl Chloride,CC(=O)Cl
+Benzoyl Chloride,C1=CC=C(C=C1)C(=O)Cl
+Acetoxyacetyl chloride,CC(=O)OCC(=O)Cl
+"3,5-Dinitrobenzoyl chloride",C1=C(C=C(C=C1[N+](=O)[O-])[N+](=O)[O-])C(=O)Cl
+4-(Trifluoromethyl)benzoyl chloride,C1=CC(=CC=C1C(=O)Cl)C(F)(F)F
+Trimethylacetyl chloride,CC(C)(C)C(=O)Cl

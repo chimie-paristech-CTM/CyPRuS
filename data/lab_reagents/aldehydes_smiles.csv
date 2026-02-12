@@ -1,0 +1,14 @@
+Nom,SMILES
+4-(Hydroxymethyl)benzaldehyde,C1=CC(=CC=C1CO)C=O
+4-(Trimethylsilylethynyl)benzaldehyde,C[Si](C)(C)C#CC1=CC=C(C=C1)C=O
+Benzaldehyde,C1=CC=C(C=C1)C=O
+4-(Trimethylsilyloxy)benzaldehyde,C[Si](C)(C)OC1=CC=C(C=C1)C=O
+4-(Bromomethyl)benzaldehyde,C1=CC(=CC=C1CBr)C=O
+"4-(N,N-Diphenylamino)benzaldehyde",C1=CC=C(C=C1)N(C2=CC=CC=C2)C3=CC=C(C=C3)C=O
+p-Anisaldehyde,COC1=CC=C(C=C1)C=O
+o-Anisaldehyde,COC1=CC=CC=C1C=O
+m-Anisaldehyde,COC1=CC=CC(=C1)C=O
+tert-Butyl 4-formylbenzylcarbamate,CC(C)(C)OC(=O)NCC1=CC=C(C=C1)C=O
+4-Formylbenzonitrile,C1=CC(=CC=C1C=O)C#N
+4-Formylbenzoic acid,C1=CC(=CC=C1C=O)C(=O)O
+Methyl 4-formylbenzoate,COC(=O)C1=CC=C(C=C1)C=O

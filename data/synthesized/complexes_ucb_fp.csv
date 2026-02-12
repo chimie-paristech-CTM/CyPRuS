@@ -1,0 +1,8 @@
+index,L1,L2,L3,ID,Fingerprint,prediction 1533,variance 1533,ucb 1533
+0,c1ccc(-c2ccnc3c2ccc2c(-c4ccccc4)ccnc23)cc1,c1ccc(-c2ccnc3c2ccc2c(-c4ccccc4)ccnc23)cc1,COc1ccc(-c2cc(-c3ccccc3)n(-c3ccccn3)n2)cc1,0,[0 0 0 ... 0 0 0],4.7232060616777005,5.124031757092351,7.439564972096754
+1,c1ccc(-c2ccccn2)nc1,c1ccc(-c2ccccn2)nc1,O=[N+]([O-])c1ccc(-c2cc(-c3ccccc3)n(-c3ccccn3)n2)cc1,1,[0 0 0 ... 0 0 0],4.183859822746703,4.9129640492192586,6.843684672407998
+2,c1ccc(-c2ccccn2)nc1,c1ccc(-c2ccccn2)nc1,O=C(O)c1ccc(-n2c(-c3ccc(N(c4ccccc4)c4ccccc4)cc3)nc3c4cccnc4c4ncccc4c32)cc1,2,[0 0 0 ... 0 0 0],4.272543241770718,4.846907421315948,6.914426412294155
+3,c1cnc2c(c1)ccc1cccnc12,c1cnc2c(c1)ccc1cccnc12,Oc1cc(Br)ccc1-c1nc2ccccc2s1,3,[0 0 0 ... 0 0 0],5.638589354598074,5.450909773185101,8.440251374433183
+4,c1cnc2c(c1)ccc1cccnc12,c1cnc2c(c1)ccc1cccnc12,CCN(CC)c1ccc(-c2nc3ccccc3s2)c(O)c1,4,[0 0 0 ... 0 0 1],5.508586658328042,5.554050939759934,8.33663074448623
+5,c1ccc(-c2ccccn2)nc1,c1ccc(-c2ccccn2)nc1,Oc1cccc2ccc(/C=C/c3cccnc3)nc12,5,[0 0 0 ... 0 0 0],4.4330257408522815,5.6472770408997555,7.284705761278074
+6,c1cnc2c(c1)ccc1cccnc12,c1cnc2c(c1)ccc1cccnc12,Oc1cccc2ccc(/C=C/c3ccc(Br)cc3)nc12,6,[0 0 0 ... 0 0 0],5.260946008915414,6.258064200563491,8.262880793152311

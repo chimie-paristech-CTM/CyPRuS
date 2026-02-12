@@ -1,0 +1,12 @@
+Nom,SMILES
+Piperidine,C1CCNCC1
+Pyrrole,C1=CNC=C1
+"2,4-Dimethyl-1H-pyrrole",CC1=CC(=CN1)C
+Dibenzylamine,C1=CC=C(C=C1)CNCC2=CC=CC=C2
+N-(2-Bromo-4-(trifluoromethoxy)phenyl)acetamide,CC(=O)NC1=C(C=C(C=C1)OC(F)(F)F)Br
+"2-Bromo-N,N-dimethylethanamine",CN(C)CCBr
+1-Methylpiperazine,CN1CCNCC1
+"N,N-Diisopropylethylamine",CCN(C(C)C)C(C)C
+4-(Piperazin-1-yl)phenol,C1CN(CCN1)C2=CC=C(C=C2)O
+Piperazine,C1CNCCN1
+Imidazole,C1=CN=CN1

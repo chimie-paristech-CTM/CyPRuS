@@ -1,0 +1,4 @@
+data/pubchem/
+data/UMAP/dataset_encoded_to_Morgan_FP.csv
+data/UMAP/dataset_encoded_to_RDKit_FP.csv
+data/UMAP/generated_200k.csv

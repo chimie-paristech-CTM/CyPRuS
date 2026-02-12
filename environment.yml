@@ -1,0 +1,15 @@
+name: ml_ruthenium_complexes
+channels:
+  - conda-forge
+dependencies:
+  - python=3.10
+  - ipykernel=6.9
+  - pandas=1.4
+  - seaborn=0.13 
+  - mols2grid=2.0
+  - xgboost
+  - hyperopt
+  - scikit-learn
+  - shap
+  - pip
+  - rdkit=2023.3.3
