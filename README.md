@@ -32,6 +32,10 @@ Please note: CheMeleon FPs can be computationally expensive to calculate, but sh
 
 If you want to directly use our models for prediction over your library:
 * Download ruthenium_complexes_dataset.csv, prediction.py, the model_fp_selection folder and the CheMeleon_GNN folder.
+* Convert your library to a CSV file with columns L1, L2 and L3 (the entries should be the SMILES strings for the 3 bidentate ligands of each of your Ru(II) complexes).
+* Open a terminal and go to the file where either Python script is located.
+
+
 * If you want to use the Random Forest + RDKit descriptors model:
 ```bash
 conda activate ml_ruthenium_complexes
