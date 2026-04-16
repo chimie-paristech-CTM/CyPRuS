@@ -1,0 +1,8 @@
+Molecular Descriptors
+Molecular Descriptors
+Molecular Descriptors
+4-fold CV for xgboost : RMSE 0.4850800357265604 , and MAE 0.3830337345471813
+4-fold CV for knn : RMSE 0.5056975598533254 , and MAE 0.3705354253372695
+Optimal parameters for RF -- fingerprints: {'max_depth': 26.0, 'max_features': 0.5, 'min_samples_leaf': 1.0, 'n_estimators': 390.0}
+10-fold CV RMSE and MAE for RF -- fingerprints: 0.43001664869277934 0.3235388445082479
+Parameters used: {'max_depth': 26.0, 'max_features': 0.5, 'min_samples_leaf': 1.0, 'n_estimators': 390.0}

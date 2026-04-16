@@ -1,0 +1,35 @@
+name: chemeleon_gpu
+
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+
+  - numpy=1.26
+  - pandas
+  - scipy
+  - scikit-learn
+  - seaborn
+  - matplotlib
+
+
+  - rdkit=2025.03
+  - descriptastorus
+  - mordredcommunity
+
+  - xgboost
+  - hyperopt
+
+
+  - chemprop=2.2
+
+
+  - setuptools=80
+
+  - pip
+
+  - pip:
+      - --extra-index-url https://download.pytorch.org/whl/cu126
+      - torch==2.9.1+cu126
+      - torchvision==0.24.1+cu126
+      - lightning==2.5.6

@@ -21,6 +21,8 @@ parser.add_argument('--pool-file', type=str, default='complexes.csv',
 parser.add_argument('--seed', type=int, default=10, help='initial seed')
 parser.add_argument('--beta', type=float, default=1.2, help='beta value for UCB acquisition function')
 parser.add_argument('--descriptors', default=False, action='store_true', help='use RDKit descriptors instead of fingerprints')
+parser.add_argument('--rdkitfp', default=False, action='store_true', help='use RDKit FP instead of Morgan fingerprints')
+
 
 
 if __name__ == "__main__":
@@ -56,6 +58,8 @@ if __name__ == "__main__":
         df_train = get_df_rdkit_descriptors(df_train)
         df_pool, descriptor_dict = get_input_descriptor_dict(df_pool)
 
+        #logger.info(descriptor_dict)
+
         print(f'Length of training dataset after augmentation :{len(df_train)}')
 
         #Prepare the logger
@@ -70,8 +74,8 @@ if __name__ == "__main__":
 
         #Initialize the model with parameters determined by Bayesian optimisation
         for seed in seeds:
-            model = RForest(max_depth=int(26), n_estimators=int(390), 
-                max_features=0.5, min_samples_leaf=int(1), seed=seed, descriptors=True)
+            model = RForest(max_depth=int(29), n_estimators=int(320), 
+                max_features=0.4, min_samples_leaf=int(1), seed=seed, descriptors=True)
             model.train(train=df_train, descriptors=True)
             preds, vars, ID_list = model.get_means_and_vars(df_pool, descriptors=True)
             ucb = upper_confidence_bound(preds, vars, args.beta)
@@ -86,15 +90,11 @@ if __name__ == "__main__":
                 seed_max_value[0] = seed
                 seed_max_value[1] = ucb.max()
 
-    else:
-
-        #Javiers code to prepare the data
-        #df_train_fps = get_fingerprints_Morgan(df_train, rad=1, nbits=1024)
-        #df_pool_fps = get_fingerprints_Morgan(df_pool, rad=1, nbits=1024, labeled=False)
+    elif args.rdkitfp:
 
         #Prepare the data
-        df_train = get_df_morgan_fingerprints(df_train, 2, 1024)
-        df_pool = get_input_morgan_fingerprints(df_pool, 2, 1024)
+        df_train = get_df_rdkit_fingerprints(df_train, nbits=2048)
+        df_pool = get_input_rdkit_fingerprints(df_pool, nbits=2048)
 
         #Prepare the logger
         logger.info(f"beta: {args.beta}")
@@ -107,8 +107,8 @@ if __name__ == "__main__":
         seed_max_value = [0, 0]
 
         for seed in seeds:
-            model = RForest(max_depth=int(27), n_estimators=int(140), 
-                max_features=0.2, min_samples_leaf=int(1), seed=seed, descriptors=False)
+            model = RForest(max_depth=int(14), n_estimators=int(350), 
+                max_features=0.4, min_samples_leaf=int(2), seed=seed, descriptors=False)
             model.train(train=df_train, descriptors=False)
             preds, vars, ID_list = model.get_means_and_vars(df_pool, descriptors=False)
             ucb = upper_confidence_bound(preds, vars, args.beta)
@@ -126,6 +126,43 @@ if __name__ == "__main__":
             #df_pool[f'ucb 1.8 {seed}'] = upper_confidence_bound(preds, vars, 1.8)
             #df_pool[f'ucb 0.2 {seed}'] = upper_confidence_bound(preds, vars, 0.2)
 
+
+
+
+    else:
+
+        #Prepare the data
+        df_train = get_df_morgan_fingerprints(df_train, 2, 1024)
+        df_pool = get_input_morgan_fingerprints(df_pool, 2, 1024)
+
+        #Prepare the logger
+        logger.info(f"beta: {args.beta}")
+        for arg, value in sorted(vars(args).items()):
+            logger.info("Argument %s: %r", arg, value)
+
+        #Prepare the seeds
+        seeds = get_seeds(args.seed, 1)
+        logger.info(seeds)
+        seed_max_value = [0, 0]
+
+        for seed in seeds:
+            model = RForest(max_depth=int(30), n_estimators=int(200), 
+                max_features=0.2, min_samples_leaf=int(1), seed=seed, descriptors=False)
+            model.train(train=df_train, descriptors=False)
+            preds, vars, ID_list = model.get_means_and_vars(df_pool, descriptors=False)
+            ucb = upper_confidence_bound(preds, vars, args.beta)
+            df_pool.reset_index(inplace=True)
+            df_pool[f'prediction {seed}'] = preds
+            df_pool[f'variance {seed}'] = vars
+            df_pool[f'ucb {seed}'] = ucb
+            #df_pool.loc[:, f'prediction {seed}'] = preds
+            #df_pool.loc[:, f'variance {seed}'] = vars
+            #df_pool.loc[:, f'ucb {seed}'] = ucb
+            if ucb.max() > seed_max_value[1]:
+                seed_max_value[0] = seed
+                seed_max_value[1] = ucb.max()
+    
+    
     df_pool.to_csv('complexes_ucb.csv', index=False)
 
 

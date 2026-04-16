@@ -231,3 +231,38 @@ def objective_mlp_desc(args_dict, data, model_class):
     cval,_ = cross_val(data, estimator, 4, descriptors=True)
 
     return cval.mean()  
+
+
+def objective_chemeleon(args_dict, logger, data, model_class=None):
+    """
+    Objective function for CheMeleon Bayesian optimization.
+
+    Args:
+        args_dict (dict): dictionary containing the hyperparameters to test
+        data (pd.DataFrame): dataframe containing the data points
+        model_class: placeholder to keep the same function signature as other objectives
+
+    Returns:
+        float: the cross-validation RMSE (to minimize)
+    """
+    args = SimpleNamespace(**args_dict)
+
+    # Extract hyperparameters from search space
+    hparams = {
+        "n_layers": int(args.n_layers),
+        "hidden_dim": int(args.hidden_dim),
+        "dropout": float(args.dropout),
+        #"lr": float(args.lr),
+        #"batch_size": int(args.batch_size)
+    }
+
+    # Call the CV function with hyperparameters
+    rmse, mae = cross_val_chemeleon(
+        df=data,
+        n_folds=4,
+        logger=logger,
+        hparams=hparams,    
+        split_dir=None   
+    )
+
+    return rmse

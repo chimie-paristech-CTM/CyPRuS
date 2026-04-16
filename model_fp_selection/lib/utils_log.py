@@ -1,7 +1,7 @@
 import logging
     
 
-def create_logger(path_name: str) -> logging.Logger:
+def create_logger(path_name: str, suffix: str = '') -> logging.Logger:
     """
     Creates a logger with a stream handler and two file handlers.
 
@@ -14,6 +14,10 @@ def create_logger(path_name: str) -> logging.Logger:
         logger: The logger.
     """
     name = path_name.split('/')[-1].split('.')[0]
+
+    if suffix:
+        name = f"{name}_{suffix}"
+        
     logger = logging.getLogger(name)
     logger.setLevel(logging.INFO)
     logger.propagate = False
