@@ -181,7 +181,7 @@ def get_df_rdkit_descriptors(df, logger=False):
 
     #Adding every permutation of the same three ligands
 
-    #df = ligands_permutation(df)
+    df = ligands_permutation(df)
 
     return df[['L1', 'L2', 'L3', 'Desc1', 'Desc2', 'Desc3', 'Descriptors', 'pIC50']]
 
@@ -394,6 +394,10 @@ def get_input_chemeleon_fp(df):
 
     #Getting the final descriptor of the complex
     df['Descriptors'] = df.apply(concatenate_float_lists, axis=1)
+
+    #Adding every permutation of the same three ligands
+
+    df = ligands_permutation(df)
 
     #Drop the duplicates
     #average_duplicates(df, 'Ligands_Dict', 'Descriptors')

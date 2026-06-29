@@ -26,6 +26,8 @@ from lightning.pytorch.callbacks import ModelCheckpoint
 import torch
 from chemprop import data, models, featurizers, nn
 
+import tempfile
+
 
 
 
@@ -411,16 +413,19 @@ def prepare_df_chemeleon(df_original):
     df = canonical_smiles(df, 'L2')
     df = canonical_smiles(df, 'L3')
 
-    df['MOL1'] = df.L1.apply(Chem.MolFromSmiles)
-    df['MOL2'] = df.L2.apply(Chem.MolFromSmiles)
-    df['MOL3'] = df.L3.apply(Chem.MolFromSmiles)
     df['Ligands_Dict'] = df.apply(get_ligands_dict, axis=1)
     df['Ligands_Set'] = df.apply(lambda row: set([row['L1'], row['L2'], row['L3']]), axis=1)
-    df['Mols_Set'] = df.apply(lambda row: set([row['MOL1'], row['MOL2'], row['MOL3']]), axis=1)
-    df['Ligands_Tuple'] = df.apply(lambda row: tuple(sorted([row['L1'], row['L2'], row['L3']])), axis=1)
 
     #AAB standardization
     df = swap_identical_ligands(df)
+
+    df['MOL1'] = df.L1.apply(Chem.MolFromSmiles)
+    df['MOL2'] = df.L2.apply(Chem.MolFromSmiles)
+    df['MOL3'] = df.L3.apply(Chem.MolFromSmiles)
+    
+    df['Mols_Set'] = df.apply(lambda row: set([row['MOL1'], row['MOL2'], row['MOL3']]), axis=1)
+    df['Ligands_Tuple'] = df.apply(lambda row: tuple(sorted([row['L1'], row['L2'], row['L3']])), axis=1)
+
 
     fp_generator = CheMeleonFingerprint(device=None)
 
@@ -475,18 +480,20 @@ def prepare_df_morgan(df_original, r, bits):
     df = canonical_smiles(df, 'L1')
     df = canonical_smiles(df, 'L2')
     df = canonical_smiles(df, 'L3')
+    
+    df['Ligands_Dict'] = df.apply(get_ligands_dict, axis=1)
+    df['Ligands_Set'] = df.apply(lambda row: set([row['L1'], row['L2'], row['L3']]), axis=1)
+
+    #AAB standardization
+    df = swap_identical_ligands(df)
 
     df['MOL1'] = df.L1.apply(Chem.MolFromSmiles)
     df['MOL2'] = df.L2.apply(Chem.MolFromSmiles)
     df['MOL3'] = df.L3.apply(Chem.MolFromSmiles)
-    df['Ligands_Dict'] = df.apply(get_ligands_dict, axis=1)
-    df['Ligands_Set'] = df.apply(lambda row: set([row['L1'], row['L2'], row['L3']]), axis=1)
+    
     df['Mols_Set'] = df.apply(lambda row: set([row['MOL1'], row['MOL2'], row['MOL3']]), axis=1)
     df['Ligands_Tuple'] = df.apply(lambda row: tuple(sorted([row['L1'], row['L2'], row['L3']])), axis=1)
 
-
-    #AAB standardization
-    df = swap_identical_ligands(df)
 
     df['ECFP4_1'] = df.MOL1.apply(lambda mol: get_morgan_fp(mol, r, bits))
     df['ECFP4_2'] = df.MOL2.apply(lambda mol: get_morgan_fp(mol, r, bits))
@@ -535,16 +542,18 @@ def prepare_df_rdkit(df_original, nbits=2048):
     df = canonical_smiles(df, 'L2')
     df = canonical_smiles(df, 'L3')
 
-    df['MOL1'] = df.L1.apply(Chem.MolFromSmiles)
-    df['MOL2'] = df.L2.apply(Chem.MolFromSmiles)
-    df['MOL3'] = df.L3.apply(Chem.MolFromSmiles)
     df['Ligands_Dict'] = df.apply(get_ligands_dict, axis=1)
     df['Ligands_Set'] = df.apply(lambda row: set([row['L1'], row['L2'], row['L3']]), axis=1)
-    df['Mols_Set'] = df.apply(lambda row: set([row['MOL1'], row['MOL2'], row['MOL3']]), axis=1)
-    df['Ligands_Tuple'] = df.apply(lambda row: tuple(sorted([row['L1'], row['L2'], row['L3']])), axis=1)
 
     #AAB standardization
     df = swap_identical_ligands(df)
+
+    df['MOL1'] = df.L1.apply(Chem.MolFromSmiles)
+    df['MOL2'] = df.L2.apply(Chem.MolFromSmiles)
+    df['MOL3'] = df.L3.apply(Chem.MolFromSmiles)
+    
+    df['Mols_Set'] = df.apply(lambda row: set([row['MOL1'], row['MOL2'], row['MOL3']]), axis=1)
+    df['Ligands_Tuple'] = df.apply(lambda row: tuple(sorted([row['L1'], row['L2'], row['L3']])), axis=1)
 
     df['RDKIT_1'] = df.MOL1.apply(lambda mol: get_rdkit_fp(mol, nbits))
     df['RDKIT_2'] = df.MOL2.apply(lambda mol: get_rdkit_fp(mol, nbits))
@@ -966,7 +975,9 @@ checkpointing = ModelCheckpoint(
     save_last=True,  # Always save the most recent checkpoint, even if it's not the best
 )
 
-def cross_validation_chemeleon(all_data, indices, num_workers=0):
+
+
+def cross_validation_chemeleon(all_data, indices, num_workers=0, init_seed=42):
     y_data= []
     y_predictions = []
 
@@ -981,84 +992,94 @@ def cross_validation_chemeleon(all_data, indices, num_workers=0):
     for i in range(len(train_CV)):
         print("CV iteration", i)
 
-        loss_history = LossHistory()
+        pl.seed_everything(init_seed + i, workers=True)
 
-        featurizer = featurizers.SimpleMoleculeMolGraphFeaturizer()
-        agg = nn.MeanAggregation()
-        chemeleon_mp = torch.load("chemeleon_mp.pt", weights_only=True)
-        mp = nn.BondMessagePassing(**chemeleon_mp['hyper_parameters'])
-        mp.load_state_dict(chemeleon_mp['state_dict'])
+        with tempfile.TemporaryDirectory() as tmpdir:
+            checkpointing = pl.callbacks.ModelCheckpoint(
+                monitor="val_loss",
+                mode="min",
+                save_top_k=1,
+                dirpath=tmpdir
+            )
 
-        train_indices, val_indices, test_indices = [train_CV[i]], [val_CV[i]], [test_CV[i]]  # unpack the tuple into three separate lists
-        train_data, val_data, test_data = data.split_data_by_indices(
-          all_data, train_indices, val_indices, test_indices
-        )
-        train_dset = data.MoleculeDataset(train_data[0], featurizer)
-        scaler = train_dset.normalize_targets()
-        val_dset = data.MoleculeDataset(val_data[0], featurizer)
-        val_dset.normalize_targets(scaler)
-        test_dset = data.MoleculeDataset(test_data[0], featurizer)
-        #test_dset.normalize_targets(scaler) this dramatically lowers R2
-        train_loader = data.build_dataloader(train_dset, num_workers=num_workers)
-        val_loader = data.build_dataloader(val_dset, num_workers=num_workers, shuffle=False)
-        test_loader = data.build_dataloader(test_dset, num_workers=num_workers, shuffle=False)
-        output_transform = nn.UnscaleTransform.from_standard_scaler(scaler)
+            loss_history = LossHistory()
 
-        ffn = nn.RegressionFFN(output_transform=output_transform, 
-        input_dim=mp.output_dim, 
-        n_layers=2,
-        hidden_dim = 400,
-        dropout=0.1)
+            featurizer = featurizers.SimpleMoleculeMolGraphFeaturizer()
+            agg = nn.MeanAggregation()
+            chemeleon_mp = torch.load("chemeleon_mp.pt", weights_only=True)
+            mp = nn.BondMessagePassing(**chemeleon_mp['hyper_parameters'])
+            mp.load_state_dict(chemeleon_mp['state_dict'])
 
-        metric_list = [nn.metrics.RMSE(), nn.metrics.MAE(), nn.metrics.R2Score()]
-        mpnn = models.MPNN(mp, agg, ffn, batch_norm=False, metrics=metric_list)
+            train_indices, val_indices, test_indices = [train_CV[i]], [val_CV[i]], [test_CV[i]]  # unpack the tuple into three separate lists
+            train_data, val_data, test_data = data.split_data_by_indices(
+              all_data, train_indices, val_indices, test_indices
+            )
+            train_dset = data.MoleculeDataset(train_data[0], featurizer)
+            scaler = train_dset.normalize_targets()
+            val_dset = data.MoleculeDataset(val_data[0], featurizer)
+            val_dset.normalize_targets(scaler)
+            test_dset = data.MoleculeDataset(test_data[0], featurizer)
+            #test_dset.normalize_targets(scaler) this dramatically lowers R2
+            train_loader = data.build_dataloader(train_dset, num_workers=num_workers, batch_size=64)
+            val_loader = data.build_dataloader(val_dset, num_workers=num_workers, batch_size=65, shuffle=False)
+            test_loader = data.build_dataloader(test_dset, num_workers=num_workers, batch_size = 72, shuffle=False)
+            output_transform = nn.UnscaleTransform.from_standard_scaler(scaler)
 
-        trainer = pl.Trainer(
-        logger=False,               # disable TensorBoard/W&B logging
-        enable_model_summary=False, # disables model architecture printout
-        enable_checkpointing=True, # Use `True` if you want to save model checkpoints. The checkpoints will be saved in the `checkpoints` folder.
-        enable_progress_bar=True,
-        log_every_n_steps=0,
-        accelerator="gpu",
-        devices=1,
-        max_epochs=20, # number of epochs to train for
-        callbacks=[checkpointing, loss_history], # Use the configured checkpoint callback
-        )
+            ffn = nn.RegressionFFN(output_transform=output_transform,
+            input_dim=mp.output_dim,
+            n_layers=2,
+            hidden_dim = 400,
+            dropout=0.1)
 
-        trainer.fit(mpnn, train_loader, val_loader, weights_only=False)   # Fit model to data
+            metric_list = [nn.metrics.RMSE(), nn.metrics.MAE(), nn.metrics.R2Score()]
+            mpnn = models.MPNN(mp, agg, ffn, batch_norm=False, metrics=metric_list)
 
-        # Ploting loss curve for each CV iteration
+            trainer = pl.Trainer(
+            logger=False,               # disable TensorBoard/W&B logging
+            enable_model_summary=False, # disables model architecture printout
+            enable_checkpointing=True, # Use `True` if you want to save model checkpoints. The checkpoints will be saved in the `checkpoints` folder.
+            enable_progress_bar=False,
+            log_every_n_steps=0,
+            accelerator="gpu",
+            devices=1,
+            max_epochs=20, # number of epochs to train for
+            callbacks=[checkpointing, loss_history], # Use the configured checkpoint callback
+            )
 
-        df_losses = pd.DataFrame(loss_history.history)
-        df_losses["fold"] = i
-        all_loss_histories.append(df_losses)
+            trainer.fit(mpnn, train_loader, val_loader)   # Fit model to data
 
-        fold_df = df_losses.sort_values("epoch")
+            # Ploting loss curve for each CV iteration
 
-        plt.figure()
+            df_losses = pd.DataFrame(loss_history.history)
+            df_losses["fold"] = i
+            all_loss_histories.append(df_losses)
 
-        plt.plot(fold_df["epoch"], fold_df["train_loss"], label="train", color="blue")
-        plt.plot(fold_df["epoch"], fold_df["val_loss"], linestyle="--", label="val", color="orange")
+            fold_df = df_losses.sort_values("epoch")
 
-        plt.title(f"Fold {i}")
-        plt.ylabel("Loss")
-        plt.legend()
+            plt.figure()
 
-        plt.xlabel("Epoch")
-        plt.tight_layout()
-        plt.show()
+            plt.plot(fold_df["epoch"], fold_df["train_loss"], label="train", color="blue")
+            plt.plot(fold_df["epoch"], fold_df["val_loss"], linestyle="--", label="val", color="orange")
 
-        ###
+            plt.title(f"Fold {i}")
+            plt.ylabel("Loss")
+            plt.legend()
 
-        test_preds = trainer.predict(mpnn, test_loader, weights_only=False)
-        test_preds = torch.cat([tensor for tensor in test_preds]) # Predict values
+            plt.xlabel("Epoch")
+            plt.tight_layout()
+            plt.show()
 
-        for i in range(len(test_preds)):
-            y_predictions.append(float(test_preds[i][0]))
-            y_data.append(test_data[0][i].y[0]) # Update lists
+            ###
 
-        results = trainer.test(dataloaders=test_loader, weights_only=False)
-        all_metrics.append(results)
+            test_preds = trainer.predict(mpnn, test_loader, ckpt_path='best', weights_only=False)
+            test_preds = torch.cat([tensor for tensor in test_preds]) # Predict values
+
+            for j in range(len(test_preds)):
+                y_predictions.append(float(test_preds[j][0]))
+                y_data.append(test_data[0][j].y[0]) # Update lists
+
+            results = trainer.test(dataloaders=test_loader, ckpt_path='best', weights_only=False)
+            all_metrics.append(results)
 
     end_time = time.time()
 
@@ -1072,9 +1093,6 @@ def cross_validation_chemeleon(all_data, indices, num_workers=0):
     print(metrics)
 
     return y_data, y_predictions
-
-
-
 
 
 def get_indices(df, CV=10, shuffle=False, random_state=42):
@@ -1243,10 +1261,9 @@ def get_indices_doi(df, CV):
         tr_te.append([train_df.index.tolist(), test_df.index.tolist()])
     return tr_te
 
-
 def get_indices_chemeleon_DOI(df, CV, sizes=(0.9, 0.1), seeder=0):
 
-    DOI = list(set(df.DOI)) # We extract the unique DOIs for each unique complex / each permutation group
+    DOI = sorted(set(df.DOI)) # We extract the unique DOIs for each unique complex / each permutation group
     k = 1 # This counts the cross-validation iteration, allowing to displace the sample used for test set at each iteration
     random.seed(seeder)
     random.shuffle(DOI) # Randomly shuffle unique DOIs
@@ -1268,6 +1285,9 @@ def get_indices_chemeleon_DOI(df, CV, sizes=(0.9, 0.1), seeder=0):
 
     for i in range(CV):
 
+        random.seed(seeder)
+        random.shuffle(DOI)
+
         DOI_train_val = []
         DOI_train = []
         DOI_val = []
@@ -1283,10 +1303,11 @@ def get_indices_chemeleon_DOI(df, CV, sizes=(0.9, 0.1), seeder=0):
         train_CV.append(train)
         val_CV.append(val)
 
+        print(f'train DOIs : {len(DOI_train)} | val DOIs : {len(DOI_val)} | test DOIs : {len(DOI_test[i])}')
+
         print(f'train length : {len(train)} | val length : {len(val)} | test length : {len(test_CV[i])}')
 
     return(train_CV, val_CV, test_CV)
-
 
 
 def get_indices_scaff(mols, CV, sizes=(0.9, 0.1), seeder=0):

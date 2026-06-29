@@ -22,6 +22,7 @@ parser.add_argument('--seed', type=int, default=10, help='initial seed')
 parser.add_argument('--beta', type=float, default=1.2, help='beta value for UCB acquisition function')
 parser.add_argument('--descriptors', default=False, action='store_true', help='use RDKit descriptors instead of fingerprints')
 parser.add_argument('--rdkitfp', default=False, action='store_true', help='use RDKit FP instead of Morgan fingerprints')
+parser.add_argument('--chemeleonfp', default=False, action='store_true', help='use CheMeleon FP instead of Morgan fingerprints (requires a pytorch environment)')
 
 
 
@@ -126,6 +127,40 @@ if __name__ == "__main__":
             #df_pool[f'ucb 1.8 {seed}'] = upper_confidence_bound(preds, vars, 1.8)
             #df_pool[f'ucb 0.2 {seed}'] = upper_confidence_bound(preds, vars, 0.2)
 
+
+    elif args.chemeleonfp:
+
+        df_train = get_df_chemeleon_fp(df_train)
+        df_pool = get_input_chemeleon_fp(df_pool)
+
+        print(f'Length of training dataset after augmentation :{len(df_train)}')
+
+        #Prepare the logger
+        logger.info(f"beta: {args.beta}")
+        for arg, value in sorted(vars(args).items()):
+            logger.info("Argument %s: %r", arg, value)
+            
+        #Prepare the seeds
+        seeds = get_seeds(args.seed, 1)
+        logger.info(seeds)
+        seed_max_value = [0, 0]
+
+        for seed in seeds:
+            model = RForest(max_depth=int(28), n_estimators=int(210), 
+                max_features=0.8, min_samples_leaf=int(1), seed=seed, descriptors=True)
+            model.train(train=df_train, descriptors=True)
+            preds, vars, ID_list = model.get_means_and_vars(df_pool, descriptors=True)
+            ucb = upper_confidence_bound(preds, vars, args.beta)
+            df_pool.reset_index(inplace=True)
+            df_pool[f'prediction {seed}'] = preds
+            df_pool[f'variance {seed}'] = vars
+            df_pool[f'ucb {seed}'] = ucb
+            #df_pool.loc[:, f'prediction {seed}'] = preds
+            #df_pool.loc[:, f'variance {seed}'] = vars
+            #df_pool.loc[:, f'ucb {seed}'] = ucb
+            if ucb.max() > seed_max_value[1]:
+                seed_max_value[0] = seed
+                seed_max_value[1] = ucb.max()
 
 
 

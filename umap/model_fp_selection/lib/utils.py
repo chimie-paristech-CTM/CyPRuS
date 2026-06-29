@@ -15,16 +15,16 @@ from rdkit.Chem.Scaffolds import MurckoScaffold
 from collections import defaultdict
 from sklearn.model_selection import KFold, GroupKFold, train_test_split
 
-#from model_fp_selection.chemeleon_fingerprint import CheMeleonFingerprint
+from model_fp_selection.chemeleon_fingerprint import CheMeleonFingerprint
 
 import time
 
-#import light#ning.pytorch as pl
-#from lightning.pytorch.callbacks import Callback
-#from lightning.pytorch.callbacks import ModelCheckpoint
+import lightning.pytorch as pl
+from lightning.pytorch.callbacks import Callback
+from lightning.pytorch.callbacks import ModelCheckpoint
 
-#import torch
-#from chemprop import data, models, featurizers, nn
+import torch
+from chemprop import data, models, featurizers, nn
 
 
 
@@ -939,139 +939,139 @@ def cross_validation(df, indices, X, y, rf, descriptors=False, permutation=True)
     return y_data, y_predictions
 
 
-# class LossHistory(pl.callbacks.Callback):
-#     def __init__(self):
-#         super().__init__()
-#         self.history = []   # initialize here
+class LossHistory(pl.callbacks.Callback):
+    def __init__(self):
+        super().__init__()
+        self.history = []   # initialize here
 
-#     def on_train_epoch_end(self, trainer, pl_module):
-#         # Extract losses if available
-#         train_loss = trainer.callback_metrics.get("train_loss")
-#         val_loss = trainer.callback_metrics.get("val_loss")
+    def on_train_epoch_end(self, trainer, pl_module):
+        # Extract losses if available
+        train_loss = trainer.callback_metrics.get("train_loss")
+        val_loss = trainer.callback_metrics.get("val_loss")
 
-#         entry = {
-#             "epoch": trainer.current_epoch,
-#             "train_loss": float(train_loss) if train_loss is not None else None,
-#             "val_loss": float(val_loss) if val_loss is not None else None,
-#         }
-#         self.history.append(entry)
+        entry = {
+            "epoch": trainer.current_epoch,
+            "train_loss": float(train_loss) if train_loss is not None else None,
+            "val_loss": float(val_loss) if val_loss is not None else None,
+        }
+        self.history.append(entry)
 
-# loss_history = LossHistory()
+loss_history = LossHistory()
 
-# checkpointing = ModelCheckpoint(
-#     "checkpoints",  # Directory where model checkpoints will be saved
-#     "best-{epoch}-{val_loss:.2f}",  # Filename format for checkpoints, including epoch and validation loss
-#     "val_loss",  # Metric used to select the best checkpoint (based on validation loss)
-#     mode="min",  # Save the checkpoint with the lowest validation loss (minimization objective)
-#     save_last=True,  # Always save the most recent checkpoint, even if it's not the best
-# )
+checkpointing = ModelCheckpoint(
+    "checkpoints",  # Directory where model checkpoints will be saved
+    "best-{epoch}-{val_loss:.2f}",  # Filename format for checkpoints, including epoch and validation loss
+    "val_loss",  # Metric used to select the best checkpoint (based on validation loss)
+    mode="min",  # Save the checkpoint with the lowest validation loss (minimization objective)
+    save_last=True,  # Always save the most recent checkpoint, even if it's not the best
+)
 
-# def cross_validation_chemeleon(all_data, indices, num_workers=0):
-#     y_data= []
-#     y_predictions = []
+def cross_validation_chemeleon(all_data, indices, num_workers=0):
+    y_data= []
+    y_predictions = []
 
-#     all_metrics = []
+    all_metrics = []
 
-#     all_loss_histories = []  # collect across folds
+    all_loss_histories = []  # collect across folds
 
-#     train_CV, val_CV, test_CV = indices
+    train_CV, val_CV, test_CV = indices
 
-#     start_time = time.time()
+    start_time = time.time()
 
-#     for i in range(len(train_CV)):
-#         print("CV iteration", i)
+    for i in range(len(train_CV)):
+        print("CV iteration", i)
 
-#         loss_history = LossHistory()
+        loss_history = LossHistory()
 
-#         featurizer = featurizers.SimpleMoleculeMolGraphFeaturizer()
-#         agg = nn.MeanAggregation()
-#         chemeleon_mp = torch.load("chemeleon_mp.pt", weights_only=True)
-#         mp = nn.BondMessagePassing(**chemeleon_mp['hyper_parameters'])
-#         mp.load_state_dict(chemeleon_mp['state_dict'])
+        featurizer = featurizers.SimpleMoleculeMolGraphFeaturizer()
+        agg = nn.MeanAggregation()
+        chemeleon_mp = torch.load("chemeleon_mp.pt", weights_only=True)
+        mp = nn.BondMessagePassing(**chemeleon_mp['hyper_parameters'])
+        mp.load_state_dict(chemeleon_mp['state_dict'])
 
-#         train_indices, val_indices, test_indices = [train_CV[i]], [val_CV[i]], [test_CV[i]]  # unpack the tuple into three separate lists
-#         train_data, val_data, test_data = data.split_data_by_indices(
-#           all_data, train_indices, val_indices, test_indices
-#         )
-#         train_dset = data.MoleculeDataset(train_data[0], featurizer)
-#         scaler = train_dset.normalize_targets()
-#         val_dset = data.MoleculeDataset(val_data[0], featurizer)
-#         val_dset.normalize_targets(scaler)
-#         test_dset = data.MoleculeDataset(test_data[0], featurizer)
-#         #test_dset.normalize_targets(scaler) this dramatically lowers R2
-#         train_loader = data.build_dataloader(train_dset, num_workers=num_workers)
-#         val_loader = data.build_dataloader(val_dset, num_workers=num_workers, shuffle=False)
-#         test_loader = data.build_dataloader(test_dset, num_workers=num_workers, shuffle=False)
-#         output_transform = nn.UnscaleTransform.from_standard_scaler(scaler)
+        train_indices, val_indices, test_indices = [train_CV[i]], [val_CV[i]], [test_CV[i]]  # unpack the tuple into three separate lists
+        train_data, val_data, test_data = data.split_data_by_indices(
+          all_data, train_indices, val_indices, test_indices
+        )
+        train_dset = data.MoleculeDataset(train_data[0], featurizer)
+        scaler = train_dset.normalize_targets()
+        val_dset = data.MoleculeDataset(val_data[0], featurizer)
+        val_dset.normalize_targets(scaler)
+        test_dset = data.MoleculeDataset(test_data[0], featurizer)
+        #test_dset.normalize_targets(scaler) this dramatically lowers R2
+        train_loader = data.build_dataloader(train_dset, num_workers=num_workers)
+        val_loader = data.build_dataloader(val_dset, num_workers=num_workers, shuffle=False)
+        test_loader = data.build_dataloader(test_dset, num_workers=num_workers, shuffle=False)
+        output_transform = nn.UnscaleTransform.from_standard_scaler(scaler)
 
-#         ffn = nn.RegressionFFN(output_transform=output_transform, 
-#         input_dim=mp.output_dim, 
-#         n_layers=2,
-#         hidden_dim = 400,
-#         dropout=0.1)
+        ffn = nn.RegressionFFN(output_transform=output_transform, 
+        input_dim=mp.output_dim, 
+        n_layers=3,
+        hidden_dim = 400,
+        dropout=0.1)
 
-#         metric_list = [nn.metrics.RMSE(), nn.metrics.MAE(), nn.metrics.R2Score()]
-#         mpnn = models.MPNN(mp, agg, ffn, batch_norm=False, metrics=metric_list)
+        metric_list = [nn.metrics.RMSE(), nn.metrics.MAE(), nn.metrics.R2Score()]
+        mpnn = models.MPNN(mp, agg, ffn, batch_norm=False, metrics=metric_list)
 
-#         trainer = pl.Trainer(
-#         logger=False,               # disable TensorBoard/W&B logging
-#         enable_model_summary=False, # disables model architecture printout
-#         enable_checkpointing=True, # Use `True` if you want to save model checkpoints. The checkpoints will be saved in the `checkpoints` folder.
-#         enable_progress_bar=True,
-#         log_every_n_steps=0,
-#         accelerator="gpu",
-#         devices=1,
-#         max_epochs=20, # number of epochs to train for
-#         callbacks=[checkpointing, loss_history], # Use the configured checkpoint callback
-#         )
+        trainer = pl.Trainer(
+        logger=False,               # disable TensorBoard/W&B logging
+        enable_model_summary=False, # disables model architecture printout
+        enable_checkpointing=True, # Use `True` if you want to save model checkpoints. The checkpoints will be saved in the `checkpoints` folder.
+        enable_progress_bar=True,
+        log_every_n_steps=0,
+        accelerator="gpu",
+        devices=1,
+        max_epochs=20, # number of epochs to train for
+        callbacks=[checkpointing, loss_history], # Use the configured checkpoint callback
+        )
 
-#         trainer.fit(mpnn, train_loader, val_loader, weights_only=False)   # Fit model to data
+        trainer.fit(mpnn, train_loader, val_loader, weights_only=False)   # Fit model to data
 
-#         # Ploting loss curve for each CV iteration
+        # Ploting loss curve for each CV iteration
 
-#         df_losses = pd.DataFrame(loss_history.history)
-#         df_losses["fold"] = i
-#         all_loss_histories.append(df_losses)
+        df_losses = pd.DataFrame(loss_history.history)
+        df_losses["fold"] = i
+        all_loss_histories.append(df_losses)
 
-#         fold_df = df_losses.sort_values("epoch")
+        fold_df = df_losses.sort_values("epoch")
 
-#         plt.figure()
+        plt.figure()
 
-#         plt.plot(fold_df["epoch"], fold_df["train_loss"], label="train", color="blue")
-#         plt.plot(fold_df["epoch"], fold_df["val_loss"], linestyle="--", label="val", color="orange")
+        plt.plot(fold_df["epoch"], fold_df["train_loss"], label="train", color="blue")
+        plt.plot(fold_df["epoch"], fold_df["val_loss"], linestyle="--", label="val", color="orange")
 
-#         plt.title(f"Fold {i}")
-#         plt.ylabel("Loss")
-#         plt.legend()
+        plt.title(f"Fold {i}")
+        plt.ylabel("Loss")
+        plt.legend()
 
-#         plt.xlabel("Epoch")
-#         plt.tight_layout()
-#         plt.show()
+        plt.xlabel("Epoch")
+        plt.tight_layout()
+        plt.show()
 
-#         ###
+        ###
 
-#         test_preds = trainer.predict(mpnn, test_loader, weights_only=False)
-#         test_preds = torch.cat([tensor for tensor in test_preds]) # Predict values
+        test_preds = trainer.predict(mpnn, test_loader, weights_only=False)
+        test_preds = torch.cat([tensor for tensor in test_preds]) # Predict values
 
-#         for i in range(len(test_preds)):
-#             y_predictions.append(float(test_preds[i][0]))
-#             y_data.append(test_data[0][i].y[0]) # Update lists
+        for i in range(len(test_preds)):
+            y_predictions.append(float(test_preds[i][0]))
+            y_data.append(test_data[0][i].y[0]) # Update lists
 
-#         results = trainer.test(dataloaders=test_loader, weights_only=False)
-#         all_metrics.append(results)
+        results = trainer.test(dataloaders=test_loader, weights_only=False)
+        all_metrics.append(results)
 
-#     end_time = time.time()
+    end_time = time.time()
 
-#     total_time = end_time - start_time
-#     print(f"Total training time: {total_time:.2f} seconds ({total_time/60:.2f} minutes)")
+    total_time = end_time - start_time
+    print(f"Total training time: {total_time:.2f} seconds ({total_time/60:.2f} minutes)")
 
-#     y_data = np.array(y_data)
-#     y_predictions = np.array(y_predictions)
+    y_data = np.array(y_data)
+    y_predictions = np.array(y_predictions)
 
-#     metrics = obtain_metrics(y_data, y_predictions)
-#     print(metrics)
+    metrics = obtain_metrics(y_data, y_predictions)
+    print(metrics)
 
-#     return y_data, y_predictions
+    return y_data, y_predictions
 
 
 

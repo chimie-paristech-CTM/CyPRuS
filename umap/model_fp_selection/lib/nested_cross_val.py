@@ -56,7 +56,7 @@ def nested_cross_val_rf(df, n_folds, split_dir=None, descriptors=False):
 
         
         # BO to find hyperparameters and define the model 
-        optimal_parameters_rf = get_optimal_parameters_rf(df_train, logger=None, max_eval=32, descriptors=descriptors)
+        optimal_parameters_rf = get_optimal_parameters_rf(df_train, logger=None, max_eval=128, descriptors=descriptors)
         model = RandomForestRegressor(max_depth=int(optimal_parameters_rf['max_depth']), n_estimators=int(optimal_parameters_rf['n_estimators']), 
             max_features=optimal_parameters_rf['max_features'], min_samples_leaf=int(optimal_parameters_rf['min_samples_leaf']))
         
@@ -156,7 +156,7 @@ def nested_cross_val_xgboost(df, n_folds, split_dir=None, descriptors=False):
 
         
         # BO to find hyperparameters and define the model 
-        optimal_parameters_xgboost = get_optimal_parameters_xgboost(df_train, logger=None, max_eval=64, descriptors=descriptors)
+        optimal_parameters_xgboost = get_optimal_parameters_xgboost(df_train, logger=None, max_eval=128, descriptors=descriptors)
         model = XGBRegressor(max_depth=int(optimal_parameters_xgboost['max_depth']), 
                         gamma=optimal_parameters_xgboost['gamma'], 
                         n_estimators=int(optimal_parameters_xgboost['n_estimators']),
@@ -259,7 +259,7 @@ def nested_cross_val_knn(df, n_folds, split_dir=None, descriptors=False):
 
         
         # BO to find hyperparameters and define the model 
-        optimal_parameters_knn = get_optimal_parameters_knn(df_train, logger=None, max_eval=64, descriptors=descriptors)
+        optimal_parameters_knn = get_optimal_parameters_knn(df_train, logger=None, max_eval=128, descriptors=descriptors)
         model = KNeighborsRegressor(n_neighbors=int(optimal_parameters_knn['n_neighbors']), 
                                     weights=optimal_parameters_knn['weights'],
                                     p=float(optimal_parameters_knn['p']))

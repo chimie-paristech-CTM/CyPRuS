@@ -1,11 +1,14 @@
 import pandas as pd
-from lib import get_optimal_parameters_xgboost, get_cross_val_accuracy_xgboost
-from lib import get_optimal_parameters_rf, get_cross_val_accuracy_rf 
-from lib import get_optimal_parameters_knn, get_cross_val_accuracy_knn
-from lib import get_optimal_parameters_mlp, get_cross_val_accuracy_mlp
-from lib import create_logger
-from lib import get_df_morgan_fingerprints, get_df_rdkit_fingerprints, get_df_rdkit_descriptors
+#from lib import get_optimal_parameters_xgboost, get_cross_val_accuracy_xgboost
+#from lib import get_optimal_parameters_rf, get_cross_val_accuracy_rf 
+#from lib import get_optimal_parameters_knn, get_cross_val_accuracy_knn
+#from lib import get_optimal_parameters_mlp, get_cross_val_accuracy_mlp
+from lib.utils_log import create_logger
+from lib.fingerprints import get_df_morgan_fingerprints, get_df_rdkit_fingerprints, get_df_rdkit_descriptors, get_df_chemeleon_fp
+from lib.final_functions import get_optimal_parameters_rf, get_cross_val_accuracy_rf
 from argparse import ArgumentParser
+import random
+import numpy as np
 
 import warnings
 # Ignore the specific FutureWarning

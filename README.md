@@ -17,32 +17,21 @@ To activate the environment:
 ```bash
 conda activate ml_ruthenium_complexes
 ```
-#### Environment for the CheMeleon fingerprints + Random Forest regression
-To set up the environment for the CheMeleon fingerprints regression (pytorch-CPU version is enough):
+#### Environment for the CheMeleon fingerprints and graph neural network
+To set up the environment for the CheMeleon graph neural network:
 ```bash
-conda env create -f chemeleon_ruthenium_complexes.yml
+conda env create -f chemeleon.yml
 ```
 To activate the environment:
 ```bash
-conda activate chemeleon_ruthenium_complexes
+conda activate ML_Ru_CheMeleon
 ```
-Please note: CheMeleon FPs can be computationally, but should be accessible on your typical laptop. On the other hand, unless your local machine has a CUDA-compatible GPU, we recommend you run the CheMeleon GNN notebooks on a remote service providing GPU access, such as Google Colab.
-
-#### Environment for the CheMeleon fine-tuned graph neural network
-
-To set up the environment for the CheMeleon model on a CUDA-compatible GPU:
-```bash
-conda env create -f chemeleon_gpu.yml
-```
-To activate the environment:
-```bash
-conda activate chemeleon_gpu
-```
+Please note: CheMeleon FPs can be computationally expensive to calculate, but should be accessible on your typical laptop. On the other hand, unless your local machine has a CUDA-compatible GPU, we recommend you run the CheMeleon GNN notebooks on a remote service providing GPU access, such as Google Colab.
 
 ## Predicting on new Ru(II) complexes
 
 If you want to directly use our models for prediction over your library:
-* Download ruthenium_complexes_dataset.csv, prediction.py (or prediction_chemeleon.py), the model_fp_selection folder and the CheMeleon folder.
+* Download ruthenium_complexes_dataset.csv, prediction.py, the model_fp_selection folder and the CheMeleon_GNN folder.
 * Convert your library to a CSV file with columns L1, L2 and L3 (the entries should be the SMILES strings for the 3 bidentate ligands of each of your Ru(II) complexes).
 * Open a terminal and go to the file where either Python script is located.
 
@@ -53,15 +42,15 @@ conda activate ml_ruthenium_complexes
 python prediction.py --pool-file 'path/to/your_library.csv' --descriptors
 ```
 
-* If you want to use the Random Forest + Morgan fingerprints model:
+* If you want to use the Random Forest + RDKit fingerprints model:
 ```bash
 conda activate ml_ruthenium_complexes
 python prediction.py --pool-file 'path/to/your_library.csv'
 ```
 
-* If you want to use the CheMeleon graph neural network (on a GPU):
+* If you want to use the CheMeleon graph neural network:
 ```bash
-conda activate chemeleon_gpu
+conda activate ML_Ru_CheMeleon
 python prediction_chemeleon.py --pool-file 'path/to/your_library.csv'
 ```
 
@@ -76,7 +65,7 @@ The ruthenium_complexes_dataset.csv file is a dataset of over 700 unique polypyr
 A first step for the project is to select the best combination of embedding and model. The search for the best combination is done through nested cross-validation, with random splitting.
 This work explores: 
 - 9 different encodings for the ligands: Morgan Fingerprints (rad=[2,3], nBits=[518, 1024, 2048]), RDKit Fingerprints, Molecular Descriptors and CheMeleon fingerprints. 
-- 3 different regression model architectures: RF, XGboost, KNN.
+- 4 different regression model architectures: RF, XGboost, KNN, MLP.
 - 1 graph neural network architecture: CheMeleon.
 The metric used to evaluate the models' performance is RMSE.
 To reproduce results, run main_model_fp_selection.py in the model_fp_selection folder after uncommenting the appropriate lines.
@@ -85,7 +74,7 @@ To reproduce results, run main_model_fp_selection.py in the model_fp_selection f
 The best parameters for the final representation + model combination were chosen using Bayesian Optimisation. To reproduce results, run main_parameters_selection.py (in model_fp_selection) after uncommenting relevant lines accordingly.
 
 ### Training the model
-We train the best (representation + model) combination with the best parameters on the curated dataset. A study of the predictive and generalization power of each (model + representation) pair (and CheMeleon GNN) is displayed in the notebooks (Regression notebooks). Particularly, we explore three different, increasingly challenging data splittings to best reproduce real-life settings. 
+We train the best (representation + model) combination with the best parameters on the curated dataset. A study of the predictive and generalization power of each (model + representation) pair (and CheMeleon GNN) is displayed in the notebooks (Regression notebooks). Particularly, we explore three different, increasingly challenging data splitings to best reproduce real-life settings. 
 
 ### Combinatorial library generation
 After scaffold extraction from the dataset (Notebook 03), we use the PubChem database to generate a library of new, unseen Ru(II) complexes in a combinatorial manner. The library is available in the data folder, split in 3 CSV files.

@@ -9,7 +9,7 @@ from tqdm.auto import tqdm
 
 from rdkit.ML.Descriptors.MoleculeDescriptors import MolecularDescriptorCalculator
 
-#from model_fp_selection.chemeleon_fingerprint import CheMeleonFingerprint
+from model_fp_selection.chemeleon_fingerprint import CheMeleonFingerprint
 
 
 
@@ -31,7 +31,7 @@ def get_df_morgan_fingerprints(df, rad, nbits, logger = False):
     df = prepare_df_morgan(df, r=rad, bits=nbits)
 
     #Drop the duplicates
-    df = average_duplicates(df, 'Ligands_Tuple', 'pIC50')
+    df = average_duplicates(df, 'Ligands_Dict', 'pIC50')
 
     if logger :
         logger.info(f'Morgan Fingerprint, rad : {rad} , nbits : {nbits}')
@@ -54,8 +54,6 @@ def get_input_morgan_fingerprints(df, rad, nbits):
 
     #Pre-process the data
     prepare_input(df)
-
-    df['Ligands_Tuple'] = df.apply(lambda row: tuple(sorted([row['L1'], row['L2'], row['L3']])), axis=1)
 
     #Getting the Fingerprint of each ligand
     tqdm.pandas(desc="Calculation of Molecular Objects L1")
@@ -96,7 +94,7 @@ def get_df_rdkit_fingerprints(df, logger=False, nbits=2048):
     df = prepare_df_rdkit(df, nbits)
 
     #Drop the duplicates
-    df = average_duplicates(df, 'Ligands_Tuple', 'pIC50')
+    df = average_duplicates(df, 'Ligands_Dict', 'pIC50')
 
     if logger :
         logger.info(f'RDKit Fingerprint')
@@ -118,8 +116,6 @@ def get_input_rdkit_fingerprints(df, nbits=2048):
 
     #Pre-process the data
     prepare_input(df)
-
-    df['Ligands_Tuple'] = df.apply(lambda row: tuple(sorted([row['L1'], row['L2'], row['L3']])), axis=1)
 
     tqdm.pandas(desc="Calculation of Molecular Objects L1")
     df['MOL1'] = df.L1.progress_apply(Chem.MolFromSmiles)
@@ -163,7 +159,7 @@ def get_df_rdkit_descriptors(df, logger=False):
     df = prepare_df_rdkit(df)
 
     #Drop the duplicates
-    df = average_duplicates(df, 'Ligands_Tuple', 'pIC50')
+    df = average_duplicates(df, 'Ligands_Dict', 'pIC50')
 
     #Getting the Fingerprint of each ligand
     df['Desc1'] = df['MOL1'].apply(lambda x: 
@@ -181,7 +177,7 @@ def get_df_rdkit_descriptors(df, logger=False):
 
     #Adding every permutation of the same three ligands
 
-    #df = ligands_permutation(df)
+    df = ligands_permutation(df)
 
     return df[['L1', 'L2', 'L3', 'Desc1', 'Desc2', 'Desc3', 'Descriptors', 'pIC50']]
 
@@ -200,7 +196,6 @@ def get_input_rdkit_descriptors(df):
     #Pre-process the data
     prepare_input(df)
     df['Ligands_Dict'] = df.apply(get_ligands_dict, axis=1)
-    df['Ligands_Tuple'] = df.apply(lambda row: tuple(sorted([row['L1'], row['L2'], row['L3']])), axis=1)
 
     #Get mol columns
     #df['MOL1'] = df.L1.apply(Chem.MolFromSmiles)
@@ -229,7 +224,7 @@ def get_input_rdkit_descriptors(df):
     df['Descriptors'] = df.apply(concatenate_float_lists, axis=1)
 
     #Drop the duplicates
-    #average_duplicates(df, 'Ligands_Tuple', 'Descriptors')
+    #average_duplicates(df, 'Ligands_Dict', 'Descriptors')
 
     return df[['L1', 'L2', 'L3', 'ID', 'Desc3', 'Descriptors']]
 
@@ -317,8 +312,6 @@ def get_df_chemeleon_fp(df_original, logger=None):
 
     df['SMILES'] = df.L1 + '.' + df.L2 + '.' + df.L3
 
-    df['Ligands_Tuple'] = df.apply(lambda row: tuple(sorted([row['L1'], row['L2'], row['L3']])), axis=1)
-
     df['MOL1'] = df.L1.apply(Chem.MolFromSmiles)
     df['MOL2'] = df.L2.apply(Chem.MolFromSmiles)
     df['MOL3'] = df.L3.apply(Chem.MolFromSmiles)
@@ -330,7 +323,7 @@ def get_df_chemeleon_fp(df_original, logger=None):
     df['pIC50'] = df['IC50'].apply(lambda x: - np.log10(x * 10 ** (-6)))
 
     #Drop the duplicates
-    df = average_duplicates(df, 'Ligands_Tuple', 'pIC50')
+    df = average_duplicates(df, 'Ligands_Dict', 'pIC50')
     df.reset_index(drop=True, inplace=True)
 
     #AAB standardization
@@ -365,8 +358,6 @@ def get_input_chemeleon_fp(df):
     prepare_input(df)
     df['Ligands_Dict'] = df.apply(get_ligands_dict, axis=1)
 
-    df['Ligands_Tuple'] = df.apply(lambda row: tuple(sorted([row['L1'], row['L2'], row['L3']])), axis=1)
-
     #Get mol columns
     #df['MOL1'] = df.L1.apply(Chem.MolFromSmiles)
     #df['MOL2'] = df.L2.apply(Chem.MolFromSmiles)
@@ -396,6 +387,6 @@ def get_input_chemeleon_fp(df):
     df['Descriptors'] = df.apply(concatenate_float_lists, axis=1)
 
     #Drop the duplicates
-    #average_duplicates(df, 'Ligands_Dict', 'Descriptors')
+    average_duplicates(df, 'Ligands_Dict', 'Descriptors')
 
     return df[['L1', 'L2', 'L3', 'ID', 'Desc3', 'Descriptors']]

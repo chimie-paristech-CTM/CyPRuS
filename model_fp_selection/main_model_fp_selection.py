@@ -1,11 +1,9 @@
 import pandas as pd
-from lib import get_nested_cross_val_accuracy_rf
-from lib import get_nested_cross_val_accuracy_xgboost
-from lib import get_nested_cross_val_accuracy_knn
-from lib import get_nested_cross_val_accuracy_mlp
-from lib import create_logger
-from lib import get_df_morgan_fingerprints, get_df_rdkit_fingerprints, get_df_rdkit_descriptors
+from lib.nested_final_functions import get_nested_cross_val_accuracy_rf, get_nested_cross_val_accuracy_xgboost, get_nested_cross_val_accuracy_knn, get_nested_cross_val_accuracy_mlp
+from lib.utils import prepare_df_morgan, prepare_df_rdkit, calc_desc
+from lib.utils_log import create_logger
 from argparse import ArgumentParser
+
 
 
 import warnings

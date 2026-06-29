@@ -411,16 +411,20 @@ def prepare_df_chemeleon(df_original):
     df = canonical_smiles(df, 'L2')
     df = canonical_smiles(df, 'L3')
 
-    df['MOL1'] = df.L1.apply(Chem.MolFromSmiles)
-    df['MOL2'] = df.L2.apply(Chem.MolFromSmiles)
-    df['MOL3'] = df.L3.apply(Chem.MolFromSmiles)
     df['Ligands_Dict'] = df.apply(get_ligands_dict, axis=1)
     df['Ligands_Set'] = df.apply(lambda row: set([row['L1'], row['L2'], row['L3']]), axis=1)
-    df['Mols_Set'] = df.apply(lambda row: set([row['MOL1'], row['MOL2'], row['MOL3']]), axis=1)
-    df['Ligands_Tuple'] = df.apply(lambda row: tuple(sorted([row['L1'], row['L2'], row['L3']])), axis=1)
 
     #AAB standardization
     df = swap_identical_ligands(df)
+
+    df['MOL1'] = df.L1.apply(Chem.MolFromSmiles)
+    df['MOL2'] = df.L2.apply(Chem.MolFromSmiles)
+    df['MOL3'] = df.L3.apply(Chem.MolFromSmiles)
+    
+    df['Mols_Set'] = df.apply(lambda row: set([row['MOL1'], row['MOL2'], row['MOL3']]), axis=1)
+    df['Ligands_Tuple'] = df.apply(lambda row: tuple(sorted([row['L1'], row['L2'], row['L3']])), axis=1)
+
+    
 
     fp_generator = CheMeleonFingerprint(device=None)
 
@@ -476,17 +480,19 @@ def prepare_df_morgan(df_original, r, bits):
     df = canonical_smiles(df, 'L2')
     df = canonical_smiles(df, 'L3')
 
-    df['MOL1'] = df.L1.apply(Chem.MolFromSmiles)
-    df['MOL2'] = df.L2.apply(Chem.MolFromSmiles)
-    df['MOL3'] = df.L3.apply(Chem.MolFromSmiles)
     df['Ligands_Dict'] = df.apply(get_ligands_dict, axis=1)
     df['Ligands_Set'] = df.apply(lambda row: set([row['L1'], row['L2'], row['L3']]), axis=1)
-    df['Mols_Set'] = df.apply(lambda row: set([row['MOL1'], row['MOL2'], row['MOL3']]), axis=1)
-    df['Ligands_Tuple'] = df.apply(lambda row: tuple(sorted([row['L1'], row['L2'], row['L3']])), axis=1)
-
 
     #AAB standardization
     df = swap_identical_ligands(df)
+
+    df['MOL1'] = df.L1.apply(Chem.MolFromSmiles)
+    df['MOL2'] = df.L2.apply(Chem.MolFromSmiles)
+    df['MOL3'] = df.L3.apply(Chem.MolFromSmiles)
+    
+    df['Mols_Set'] = df.apply(lambda row: set([row['MOL1'], row['MOL2'], row['MOL3']]), axis=1)
+    df['Ligands_Tuple'] = df.apply(lambda row: tuple(sorted([row['L1'], row['L2'], row['L3']])), axis=1)
+
 
     df['ECFP4_1'] = df.MOL1.apply(lambda mol: get_morgan_fp(mol, r, bits))
     df['ECFP4_2'] = df.MOL2.apply(lambda mol: get_morgan_fp(mol, r, bits))
@@ -535,16 +541,19 @@ def prepare_df_rdkit(df_original, nbits=2048):
     df = canonical_smiles(df, 'L2')
     df = canonical_smiles(df, 'L3')
 
-    df['MOL1'] = df.L1.apply(Chem.MolFromSmiles)
-    df['MOL2'] = df.L2.apply(Chem.MolFromSmiles)
-    df['MOL3'] = df.L3.apply(Chem.MolFromSmiles)
     df['Ligands_Dict'] = df.apply(get_ligands_dict, axis=1)
     df['Ligands_Set'] = df.apply(lambda row: set([row['L1'], row['L2'], row['L3']]), axis=1)
-    df['Mols_Set'] = df.apply(lambda row: set([row['MOL1'], row['MOL2'], row['MOL3']]), axis=1)
-    df['Ligands_Tuple'] = df.apply(lambda row: tuple(sorted([row['L1'], row['L2'], row['L3']])), axis=1)
 
     #AAB standardization
     df = swap_identical_ligands(df)
+
+    df['MOL1'] = df.L1.apply(Chem.MolFromSmiles)
+    df['MOL2'] = df.L2.apply(Chem.MolFromSmiles)
+    df['MOL3'] = df.L3.apply(Chem.MolFromSmiles)
+    
+    df['Mols_Set'] = df.apply(lambda row: set([row['MOL1'], row['MOL2'], row['MOL3']]), axis=1)
+    df['Ligands_Tuple'] = df.apply(lambda row: tuple(sorted([row['L1'], row['L2'], row['L3']])), axis=1)
+
 
     df['RDKIT_1'] = df.MOL1.apply(lambda mol: get_rdkit_fp(mol, nbits))
     df['RDKIT_2'] = df.MOL2.apply(lambda mol: get_rdkit_fp(mol, nbits))
@@ -579,9 +588,9 @@ def prepare_input(df):
     df.reset_index(drop=True, inplace=True)
 
     #Making smiles canonical - this is only for data analysis purposes
-    canonical_smiles(df, 'L1')
-    canonical_smiles(df, 'L2')
-    canonical_smiles(df, 'L3')
+    df = canonical_smiles(df, 'L1')
+    df = canonical_smiles(df, 'L2')
+    df = canonical_smiles(df, 'L3')
 
     df['ID'] = df.index
 
@@ -799,53 +808,53 @@ def ligands_permutation(df):
 # Different Splittings 
 
 
-def df_split(df, sizes=(0.9, 0.1), seed=0):
+# def df_split(df, sizes=(0.9, 0.1), seed=0):
 
-    """
-    This function splits the dataset intro a train and a test set. It makes sure that all the permutations for the same complex
-    are stored in the same set. 
+#     """
+#     This function splits the dataset intro a train and a test set. It makes sure that all the permutations for the same complex
+#     are stored in the same set. 
     
-    Args:
-        df : dataframe 
+#     Args:
+#         df : dataframe 
     
-    returns:
-        train (list): list of indices of the train set
-        test (list): list of indices of the test set
-    """
+#     returns:
+#         train (list): list of indices of the train set
+#         test (list): list of indices of the test set
+#     """
 
-    assert sum(sizes) == 1
+#     assert sum(sizes) == 1
 
-    ID = list(set(df.ID)) # We extract the unique IDs for each unique complex / each permutation group
+#     ID = list(set(df.ID)) # We extract the unique IDs for each unique complex / each permutation group
 
-    # Split
-    train, val, test = [], [], []
+#     # Split
+#     train, val, test = [], [], []
 
-    random.seed(seed)
-    random.shuffle(ID) # Randomly shuffle unique IDs
-    train_range = int(sizes[0] * len(ID))
-    #val_range = int(sizes[1] * len(ID))
+#     random.seed(seed)
+#     random.shuffle(ID) # Randomly shuffle unique IDs
+#     train_range = int(sizes[0] * len(ID))
+#     #val_range = int(sizes[1] * len(ID))
 
-    for i in range(train_range):
-        selected = df[df['ID'] == ID[i]]
-        indices = selected.index.tolist() # The absolute indices of these entries (which are consecutive in the dataframe) are added to the train set
-        for i in indices:
-            train.append(i)
+#     for i in range(train_range):
+#         selected = df[df['ID'] == ID[i]]
+#         indices = selected.index.tolist() # The absolute indices of these entries (which are consecutive in the dataframe) are added to the train set
+#         for i in indices:
+#             train.append(i)
 
-    #for i in range(train_range, train_range + val_range):
-    #    selected = df[df['ID'] == ID[i]]
-    #    indices = selected.index.tolist()
-    #    for i in indices:
-    #        val.append(i)
+#     #for i in range(train_range, train_range + val_range):
+#     #    selected = df[df['ID'] == ID[i]]
+#     #    indices = selected.index.tolist()
+#     #    for i in indices:
+#     #        val.append(i)
 
-    for i in range(train_range, len(ID)):
-        selected = df[df['ID'] == ID[i]]
-        indices = selected.index.tolist()
-        for i in indices:
-            test.append(i)
+#     for i in range(train_range, len(ID)):
+#         selected = df[df['ID'] == ID[i]]
+#         indices = selected.index.tolist()
+#         for i in indices:
+#             test.append(i)
 
-    print(f'train length : {len(train)} | test length : {len(test)}')
+#     print(f'train length : {len(train)} | test length : {len(test)}')
 
-    return train, test
+#     return train, test
 
 
 # Cross Validation and Scaling the data 
@@ -1654,7 +1663,7 @@ def get_mean_distances_dataset(df, dataset, distance, desc = False):
             fingerprint = row['Descriptors']
             #we get the distance between a complexe to-be-tested and the entire dataset
             list_dist = get_distances(dataset, fingerprint, distance, desc = True)
-            if len(list) !=0 :
+            if len(list_dist) !=0 :
                 mean_distance = np.mean(list_dist) 
                 mean_distances.append(mean_distance)
         else : 

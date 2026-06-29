@@ -1,12 +1,8 @@
 import pandas as pd
-from lib import get_nested_cross_val_accuracy_rf
-from lib import get_nested_cross_val_accuracy_xgboost
-from lib import get_nested_cross_val_accuracy_knn
-from lib import get_nested_cross_val_accuracy_mlp
-from lib import create_logger
-from lib import get_df_morgan_fingerprints, get_df_rdkit_fingerprints, get_df_rdkit_descriptors
+from lib.nested_final_functions import get_nested_cross_val_accuracy_rf, get_nested_cross_val_accuracy_xgboost, get_nested_cross_val_accuracy_knn, get_nested_cross_val_accuracy_mlp
+from lib.utils import prepare_df_morgan, prepare_df_rdkit, calc_desc, prepare_df_chemeleon
+from lib.utils_log import create_logger
 from argparse import ArgumentParser
-
 
 import warnings
 # Ignore the specific FutureWarning
@@ -144,15 +140,27 @@ if __name__ == '__main__':
 
 
     """RDKit Molecular Descriptors"""
-    df = pd.read_csv(args.input_file)
-    df = get_df_rdkit_descriptors(df,logger)
+    # df = pd.read_csv(args.input_file)
+    # df = get_df_rdkit_descriptors(df,logger)
         #rf
     #get_nested_cross_val_accuracy_rf(df, logger, 4, split_dir, descriptors=True)
         #xgboost
-    get_nested_cross_val_accuracy_xgboost(df, logger, 4, split_dir, descriptors=True)
+    # get_nested_cross_val_accuracy_xgboost(df, logger, 4, split_dir, descriptors=True)
         #knn
-    get_nested_cross_val_accuracy_knn(df, logger, 4, split_dir, descriptors=True) 
+    # get_nested_cross_val_accuracy_knn(df, logger, 4, split_dir, descriptors=True) 
         #mlp
     #get_nested_cross_val_accuracy_mlp(df, logger, 4, split_dir, descriptors=True) 
 
- 
+    
+    """CheMeleon Fingerprint"""
+
+    df = pd.read_csv(args.input_file)
+    df = prepare_df_chemeleon(df)
+        #rf
+    get_nested_cross_val_accuracy_rf(df, logger, 4, split_dir, descriptors=True)
+        #xgboost
+    #get_nested_cross_val_accuracy_xgboost(df, logger, 4, split_dir, descriptors=True)
+        #knn
+    #get_nested_cross_val_accuracy_knn(df, logger, 4, split_dir, descriptors=True) 
+        #mlp
+    #get_nested_cross_val_accuracy_mlp(df, logger, 4, split_dir, descriptors=True) 

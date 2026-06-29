@@ -1,11 +1,16 @@
 import pandas as pd
-from lib import get_optimal_parameters_xgboost, get_cross_val_accuracy_xgboost
-from lib import get_optimal_parameters_rf, get_cross_val_accuracy_rf 
-from lib import get_optimal_parameters_knn, get_cross_val_accuracy_knn
-from lib import get_optimal_parameters_mlp, get_cross_val_accuracy_mlp
-from lib import create_logger
-from lib import get_df_morgan_fingerprints, get_df_rdkit_fingerprints, get_df_rdkit_descriptors
+#from lib import get_optimal_parameters_xgboost, get_cross_val_accuracy_xgboost
+#from lib import get_optimal_parameters_rf, get_cross_val_accuracy_rf 
+#from lib import get_optimal_parameters_knn, get_cross_val_accuracy_knn
+#from lib import get_optimal_parameters_mlp, get_cross_val_accuracy_mlp
+from model_fp_selection.lib.utils_log import create_logger
+from model_fp_selection.lib.fingerprints import get_df_morgan_fingerprints, get_df_rdkit_fingerprints, get_df_rdkit_descriptors, get_df_chemeleon_fp
+from model_fp_selection.lib.final_functions import get_optimal_parameters_gnn, get_cross_val_accuracy_gnn, get_optimal_parameters_gnn_gridsearch
 from argparse import ArgumentParser
+import random
+import numpy as np
+import torch
+
 
 import warnings
 # Ignore the specific FutureWarning
@@ -37,6 +42,17 @@ if __name__ == '__main__':
     First, choose the Molecular Representation you want to use : morgan fingerprints, rdkit fingerprints or molecular descritpors.
     """
 
+    def set_seed(seed=42):
+        random.seed(seed)
+        np.random.seed(seed)
+        torch.manual_seed(seed)
+        torch.cuda.manual_seed_all(seed)
+        torch.backends.cudnn.deterministic = True
+        torch.backends.cudnn.benchmark = False
+
+    set_seed(42)
+
+
     #Morgan Fingerprint, various radius (2 and 3) and bits (512, 1024 and 2048)
     #df = pd.read_csv(args.input_file)
     #df = get_df_morgan_fingerprints(df,2,512, logger)
@@ -53,8 +69,13 @@ if __name__ == '__main__':
     #df = get_df_rdkit_fingerprints(df, logger, nbits=2048)
 
     #RDKit Molecular Descriptors
+    # df = pd.read_csv(args.input_file)
+    # df = get_df_rdkit_descriptors(df, logger)
+
+    #CheMeleon Fingerprints + GNN (both CheMeleon FPs and simple addition of SMILES are performed)
     df = pd.read_csv(args.input_file)
-    df = get_df_rdkit_descriptors(df, logger)
+    df['ID']=[i for i in range(len(df))]
+    df = get_df_chemeleon_fp(df, logger)
 
 
     """
@@ -80,3 +101,7 @@ if __name__ == '__main__':
     #optimal_parameters_mlp = get_optimal_parameters_mlp(df, logger, max_eval=128, descriptors=True)
     #get_cross_val_accuracy_mlp(df, logger, 10, optimal_parameters_mlp, split_dir, descriptors=True)
  
+ 
+    # CheMeleon GNN
+    optimal_parameters_gnn = get_optimal_parameters_gnn_gridsearch(df, logger, descriptors=False) 
+    get_cross_val_accuracy_gnn(df, logger, 10, optimal_parameters_gnn, split_dir, descriptors=False)
