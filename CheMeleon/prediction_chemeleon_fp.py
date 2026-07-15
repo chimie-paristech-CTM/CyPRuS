@@ -110,8 +110,8 @@ if __name__ == "__main__":
         seed_max_value = [0, 0]
 
         for seed in seeds:
-            model = RForest(max_depth=int(28), n_estimators=int(210), 
-                max_features=0.8, min_samples_leaf=int(1), seed=seed, descriptors=True)
+            model = RForest(max_depth=int(25), n_estimators=int(380), 
+                max_features=0.4, min_samples_leaf=int(1), seed=seed, descriptors=True)
             model.train(train=df_train, descriptors=True)
             preds, vars, ID_list = model.get_means_and_vars(df_pool, descriptors=True)
             ucb = upper_confidence_bound(preds, vars, args.beta)

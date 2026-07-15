@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import hashlib, pickle
 from argparse import ArgumentParser
 from model_fp_selection.lib.fingerprints import get_df_rdkit_fingerprints, get_input_rdkit_fingerprints
 from model_fp_selection.lib.fingerprints import get_df_morgan_fingerprints, get_input_morgan_fingerprints
@@ -77,6 +78,18 @@ if __name__ == "__main__":
         for seed in seeds:
             model = RForest(max_depth=int(29), n_estimators=int(320), 
                 max_features=0.4, min_samples_leaf=int(1), seed=seed, descriptors=True)
+
+
+            train_hash = hashlib.md5(pickle.dumps(df_train['Descriptors'].tolist())).hexdigest()
+            target_hash = hashlib.md5(pickle.dumps(df_train['pIC50'].tolist())).hexdigest()
+            print(f"Descriptors hash: {train_hash}")
+            print(f"pIC50 hash: {target_hash}")
+            print(f"Train length: {len(df_train)}")
+
+            sorted_descs = sorted([tuple(d) for d in df_train['Descriptors'].tolist()])
+            train_hash = hashlib.md5(pickle.dumps(sorted_descs)).hexdigest()
+            print(f"Descriptors hash (order-insensitive): {train_hash}")
+
             model.train(train=df_train, descriptors=True)
             preds, vars, ID_list = model.get_means_and_vars(df_pool, descriptors=True)
             ucb = upper_confidence_bound(preds, vars, args.beta)

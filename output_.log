@@ -1,0 +1,270 @@
+beta: 1.2
+Argument beta: 1.2
+Argument chemeleonfp: False
+Argument descriptors: True
+Argument pool_file: '.\\synthesized_complexes_2.csv'
+Argument rdkitfp: False
+Argument seed: 10
+Argument train_file: '.\\ruthenium_complexes_dataset.csv'
+[1533]
+beta: 1.2
+Argument beta: 1.2
+Argument chemeleonfp: False
+Argument descriptors: True
+Argument pool_file: '.\\synthesized_complexes_2.csv'
+Argument rdkitfp: False
+Argument seed: 10
+Argument train_file: '.\\ruthenium_complexes_dataset_charges.csv'
+[1533]
+beta: 1.2
+Argument beta: 1.2
+Argument chemeleonfp: False
+Argument descriptors: True
+Argument pool_file: '.\\synthesized_complexes_2.csv'
+Argument rdkitfp: False
+Argument seed: 10
+Argument train_file: '.\\ruthenium_complexes_dataset_charges.csv'
+[1533]
+beta: 1.2
+Argument beta: 1.2
+Argument chemeleonfp: False
+Argument descriptors: False
+Argument pool_file: '.\\synthesized_complexes_2.csv'
+Argument rdkitfp: False
+Argument seed: 10
+Argument train_file: '.\\ruthenium_complexes_dataset_charges.csv'
+[1533]
+beta: 1.2
+Argument beta: 1.2
+Argument chemeleonfp: False
+Argument descriptors: True
+Argument pool_file: '.\\synthesized_complexes_2.csv'
+Argument rdkitfp: False
+Argument seed: 10
+Argument train_file: '.\\ruthenium_complexes_dataset_charges.csv'
+[1533]
+beta: 1.2
+Argument beta: 1.2
+Argument chemeleonfp: False
+Argument descriptors: True
+Argument pool_file: '.\\synthesized_complexes_2.csv'
+Argument rdkitfp: False
+Argument seed: 10
+Argument train_file: '.\\ruthenium_complexes_dataset_charges.csv'
+[1533]
+beta: 1.2
+Argument beta: 1.2
+Argument chemeleonfp: False
+Argument descriptors: False
+Argument pool_file: '.\\synthesized_complexes_2.csv'
+Argument rdkitfp: True
+Argument seed: 10
+Argument train_file: '.\\ruthenium_complexes_dataset_charges.csv'
+[1533]
+beta: 1.2
+Argument beta: 1.2
+Argument chemeleonfp: False
+Argument descriptors: True
+Argument pool_file: '.\\synthesized_complexes_2.csv'
+Argument rdkitfp: False
+Argument seed: 10
+Argument train_file: '.\\ruthenium_complexes_dataset_charges.csv'
+[1533]
+beta: 1.2
+Argument beta: 1.2
+Argument chemeleonfp: False
+Argument descriptors: True
+Argument pool_file: '.\\synthesized_complexes_2.csv'
+Argument rdkitfp: False
+Argument seed: 10
+Argument train_file: '.\\ruthenium_complexes_dataset_charges.csv'
+[1533]
+beta: 1.2
+Argument beta: 1.2
+Argument chemeleonfp: False
+Argument descriptors: False
+Argument pool_file: '.\\synthesized_complexes_2.csv'
+Argument rdkitfp: False
+Argument seed: 10
+Argument train_file: '.\\ruthenium_complexes_dataset_charges.csv'
+[1533]
+beta: 1.2
+Argument beta: 1.2
+Argument chemeleonfp: False
+Argument descriptors: False
+Argument pool_file: '.\\synthesized_complexes_2.csv'
+Argument rdkitfp: True
+Argument seed: 10
+Argument train_file: '.\\ruthenium_complexes_dataset_charges.csv'
+[1533]
+beta: 1.2
+Argument beta: 1.2
+Argument chemeleonfp: False
+Argument descriptors: True
+Argument pool_file: '.\\synthesized_complexes_2.csv'
+Argument rdkitfp: False
+Argument seed: 10
+Argument train_file: '.\\ruthenium_complexes_dataset_charges.csv'
+[1533]
+beta: 1.2
+Argument beta: 1.2
+Argument chemeleonfp: False
+Argument descriptors: True
+Argument pool_file: '.\\synthesized_complexes_2.csv'
+Argument rdkitfp: False
+Argument seed: 10
+Argument train_file: '.\\ruthenium_complexes_dataset_charges.csv'
+[1533]
+beta: 1.2
+Argument beta: 1.2
+Argument chemeleonfp: False
+Argument descriptors: True
+Argument pool_file: '.\\synthesized_complexes_2.csv'
+Argument rdkitfp: False
+Argument seed: 10
+Argument train_file: '.\\ruthenium_complexes_dataset_charges.csv'
+[1533]
+beta: 1.2
+Argument beta: 1.2
+Argument chemeleonfp: False
+Argument descriptors: True
+Argument pool_file: '.\\synthesized_complexes_2.csv'
+Argument rdkitfp: False
+Argument seed: 10
+Argument train_file: '.\\ruthenium_complexes_dataset_charges.csv'
+[1533]
+beta: 1.2
+Argument beta: 1.2
+Argument chemeleonfp: False
+Argument descriptors: True
+Argument pool_file: '.\\synthesized_complexes_2.csv'
+Argument rdkitfp: False
+Argument seed: 10
+Argument train_file: '.\\ruthenium_complexes_dataset_charges.csv'
+[1533]
+beta: 1.2
+Argument beta: 1.2
+Argument chemeleonfp: False
+Argument descriptors: True
+Argument pool_file: '.\\synthesized_complexes_2.csv'
+Argument rdkitfp: False
+Argument seed: 10
+Argument train_file: '.\\ruthenium_complexes_dataset_charges.csv'
+[1533]
+beta: 1.2
+Argument beta: 1.2
+Argument chemeleonfp: False
+Argument descriptors: False
+Argument pool_file: '.\\synthesized_complexes_2.csv'
+Argument rdkitfp: True
+Argument seed: 10
+Argument train_file: '.\\ruthenium_complexes_dataset_charges.csv'
+[1533]
+beta: 1.2
+Argument beta: 1.2
+Argument chemeleonfp: False
+Argument descriptors: False
+Argument pool_file: '.\\synthesized_complexes_2.csv'
+Argument rdkitfp: False
+Argument seed: 10
+Argument train_file: '.\\ruthenium_complexes_dataset_charges.csv'
+[1533]
+beta: 1.2
+Argument beta: 1.2
+Argument chemeleonfp: False
+Argument descriptors: True
+Argument pool_file: './synthesized_complexes_2.csv'
+Argument rdkitfp: False
+Argument seed: 10
+Argument train_file: '.\\selectivity\\ruthenium_complexes_dataset_cancer.csv'
+[1533]
+beta: 1.2
+Argument beta: 1.2
+Argument chemeleonfp: False
+Argument descriptors: True
+Argument pool_file: './synthesized_complexes_2.csv'
+Argument rdkitfp: False
+Argument seed: 10
+Argument train_file: '.\\selectivity\\ruthenium_complexes_dataset_healthy.csv'
+[1533]
+beta: 1.2
+Argument beta: 1.2
+Argument chemeleonfp: False
+Argument descriptors: True
+Argument pool_file: './synthesized_complexes_2.csv'
+Argument rdkitfp: False
+Argument seed: 10
+Argument train_file: '.\\selectivity\\ruthenium_complexes_dataset_cancer.csv'
+[1533]
+beta: 1.2
+Argument beta: 1.2
+Argument chemeleonfp: False
+Argument descriptors: True
+Argument pool_file: './synthesized_complexes_2.csv'
+Argument rdkitfp: False
+Argument seed: 10
+Argument train_file: '.\\selectivity\\ruthenium_complexes_dataset_healthy.csv'
+[1533]
+beta: 1.2
+Argument beta: 1.2
+Argument chemeleonfp: False
+Argument descriptors: False
+Argument pool_file: './synthesized_complexes_2.csv'
+Argument rdkitfp: False
+Argument seed: 10
+Argument train_file: '.\\selectivity\\ruthenium_complexes_dataset_cancer.csv'
+[1533]
+beta: 1.2
+Argument beta: 1.2
+Argument chemeleonfp: False
+Argument descriptors: False
+Argument pool_file: './synthesized_complexes_2.csv'
+Argument rdkitfp: False
+Argument seed: 10
+Argument train_file: '.\\selectivity\\ruthenium_complexes_dataset_healthy.csv'
+[1533]
+beta: 1.2
+Argument beta: 1.2
+Argument chemeleonfp: False
+Argument descriptors: False
+Argument pool_file: './synthesized_complexes_2.csv'
+Argument rdkitfp: True
+Argument seed: 10
+Argument train_file: '.\\selectivity\\ruthenium_complexes_dataset_cancer.csv'
+[1533]
+beta: 1.2
+Argument beta: 1.2
+Argument chemeleonfp: False
+Argument descriptors: False
+Argument pool_file: './synthesized_complexes_2.csv'
+Argument rdkitfp: True
+Argument seed: 10
+Argument train_file: '.\\selectivity\\ruthenium_complexes_dataset_healthy.csv'
+[1533]
+beta: 1.2
+Argument beta: 1.2
+Argument chemeleonfp: False
+Argument descriptors: False
+Argument pool_file: '.\\synthesized_complexes_3.csv'
+Argument rdkitfp: False
+Argument seed: 10
+Argument train_file: '.\\ruthenium_complexes_dataset.csv'
+[1533]
+beta: 1.2
+Argument beta: 1.2
+Argument chemeleonfp: False
+Argument descriptors: False
+Argument pool_file: '.\\synthesized_complexes_3.csv'
+Argument rdkitfp: True
+Argument seed: 10
+Argument train_file: '.\\ruthenium_complexes_dataset.csv'
+[1533]
+beta: 1.2
+Argument beta: 1.2
+Argument chemeleonfp: False
+Argument descriptors: True
+Argument pool_file: '.\\synthesized_complexes_3.csv'
+Argument rdkitfp: False
+Argument seed: 10
+Argument train_file: '.\\ruthenium_complexes_dataset.csv'
+[1533]

@@ -353,6 +353,7 @@ def get_df_chemeleon_fp(df_original, logger=None):
 
     df['ID']=[i for i in range(len(df))]
 
+    df = ligands_permutation(df)
 
     if logger :
         logger.info(f'Chemeleon fingerprints')
@@ -397,7 +398,7 @@ def get_input_chemeleon_fp(df):
 
     #Adding every permutation of the same three ligands
 
-    df = ligands_permutation(df)
+    #df = ligands_permutation(df)
 
     #Drop the duplicates
     #average_duplicates(df, 'Ligands_Dict', 'Descriptors')

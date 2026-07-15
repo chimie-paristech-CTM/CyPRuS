@@ -15,16 +15,16 @@ from rdkit.Chem.Scaffolds import MurckoScaffold
 from collections import defaultdict
 from sklearn.model_selection import KFold, GroupKFold, train_test_split
 
-#from model_fp_selection.chemeleon_fingerprint import CheMeleonFingerprint
+# from model_fp_selection.chemeleon_fingerprint import CheMeleonFingerprint
 
 import time
 
-#import light#ning.pytorch as pl
-#from lightning.pytorch.callbacks import Callback
-#from lightning.pytorch.callbacks import ModelCheckpoint
+# import lightning.pytorch as pl
+# from lightning.pytorch.callbacks import Callback
+# from lightning.pytorch.callbacks import ModelCheckpoint
 
-#import torch
-#from chemprop import data, models, featurizers, nn
+# import torch
+# from chemprop import data, models, featurizers, nn
 
 
 
@@ -212,7 +212,7 @@ def get_morgan_fp_from_smiles(smiles, n, bits):
     
 def get_rdkit_fp_from_smiles(smiles, nbits):
     
-    """
+   """
     Get RDKit fingerprint of the ligands from SMILES
 
     Args:
@@ -221,24 +221,9 @@ def get_rdkit_fp_from_smiles(smiles, nbits):
 
     Returns:
         np.array: the fingerprint
-    """
-    if not isinstance(smiles, str) or not smiles.strip():
-        # Empty string or non-string
-        return None
-    
-    mol = Chem.MolFromSmiles(smiles)
-    if mol is None or mol.GetNumAtoms() == 0:
-        # Invalid SMILES
-        return None
-    
-    try:
-        fp = AllChem.RDKFingerprint(mol, fpSize=nbits)
-    except RuntimeError as e:
-        # Catch RDKit pre-condition errors
-        print(f"Warning: cannot compute fingerprint for SMILES '{smiles}': {e}")
-        return None
-    
-    return np.array(fp)
+        """
+   
+   return np.array(AllChem.RDKFingerprint(Chem.MolFromSmiles(smiles, nBits=nbits)))
 
 
 def convert_to_float(value):
@@ -314,7 +299,6 @@ def average_duplicates_old(df, column_todrop, column_values):
     print(f'Length of training dataset after cleaning duplicates, before adding permutations : {len(df)}')
     return df
 
-
 def average_duplicates(df, col1, col2):
     
     other_cols = [c for c in df.columns if c not in [col2, col1]]
@@ -325,7 +309,6 @@ def average_duplicates(df, col1, col2):
 
     return df_avg
 
-    
 
 def prepare_df(df_original):
 
@@ -358,9 +341,9 @@ def prepare_df(df_original):
 
     df['Ligands_Dict'] = df.apply(get_ligands_dict, axis=1)
     df['Ligands_Set'] = df.apply(lambda row: set([row['L1'], row['L2'], row['L3']]), axis=1)
-    #df['Mols_Set'] = df.apply(lambda row: set([row['MOL1'], row['MOL2'], row['MOL3']]), axis=1)
     df['Ligands_Tuple'] = df.apply(lambda row: tuple(sorted([row['L1'], row['L2'], row['L3']])), axis=1)
-
+    df['Ligands_Sum'] = df.L1 + df.L2 + df.L3
+    #df['Mols_Set'] = df.apply(lambda row: set([row['MOL1'], row['MOL2'], row['MOL3']]), axis=1)
 
     #AAB standardization
     df = swap_identical_ligands(df)
@@ -411,8 +394,13 @@ def prepare_df_chemeleon(df_original):
     df = canonical_smiles(df, 'L2')
     df = canonical_smiles(df, 'L3')
 
+
     df['Ligands_Dict'] = df.apply(get_ligands_dict, axis=1)
     df['Ligands_Set'] = df.apply(lambda row: set([row['L1'], row['L2'], row['L3']]), axis=1)
+    # df['Mols_Set'] = df.apply(lambda row: set([row['MOL1'], row['MOL2'], row['MOL3']]), axis=1)
+    df['Ligands_Tuple'] = df.apply(lambda row: tuple(sorted([row['L1'], row['L2'], row['L3']])), axis=1)
+    df['Ligands_Sum'] = df.L1 + df.L2 + df.L3
+
 
     #AAB standardization
     df = swap_identical_ligands(df)
@@ -420,11 +408,6 @@ def prepare_df_chemeleon(df_original):
     df['MOL1'] = df.L1.apply(Chem.MolFromSmiles)
     df['MOL2'] = df.L2.apply(Chem.MolFromSmiles)
     df['MOL3'] = df.L3.apply(Chem.MolFromSmiles)
-    
-    df['Mols_Set'] = df.apply(lambda row: set([row['MOL1'], row['MOL2'], row['MOL3']]), axis=1)
-    df['Ligands_Tuple'] = df.apply(lambda row: tuple(sorted([row['L1'], row['L2'], row['L3']])), axis=1)
-
-    
 
     fp_generator = CheMeleonFingerprint(device=None)
 
@@ -480,8 +463,12 @@ def prepare_df_morgan(df_original, r, bits):
     df = canonical_smiles(df, 'L2')
     df = canonical_smiles(df, 'L3')
 
+
     df['Ligands_Dict'] = df.apply(get_ligands_dict, axis=1)
     df['Ligands_Set'] = df.apply(lambda row: set([row['L1'], row['L2'], row['L3']]), axis=1)
+    # df['Mols_Set'] = df.apply(lambda row: set([row['MOL1'], row['MOL2'], row['MOL3']]), axis=1)
+    df['Ligands_Tuple'] = df.apply(lambda row: tuple(sorted([row['L1'], row['L2'], row['L3']])), axis=1)
+    df['Ligands_Sum'] = df.L1 + df.L2 + df.L3
 
     #AAB standardization
     df = swap_identical_ligands(df)
@@ -489,10 +476,6 @@ def prepare_df_morgan(df_original, r, bits):
     df['MOL1'] = df.L1.apply(Chem.MolFromSmiles)
     df['MOL2'] = df.L2.apply(Chem.MolFromSmiles)
     df['MOL3'] = df.L3.apply(Chem.MolFromSmiles)
-    
-    df['Mols_Set'] = df.apply(lambda row: set([row['MOL1'], row['MOL2'], row['MOL3']]), axis=1)
-    df['Ligands_Tuple'] = df.apply(lambda row: tuple(sorted([row['L1'], row['L2'], row['L3']])), axis=1)
-
 
     df['ECFP4_1'] = df.MOL1.apply(lambda mol: get_morgan_fp(mol, r, bits))
     df['ECFP4_2'] = df.MOL2.apply(lambda mol: get_morgan_fp(mol, r, bits))
@@ -541,8 +524,12 @@ def prepare_df_rdkit(df_original, nbits=2048):
     df = canonical_smiles(df, 'L2')
     df = canonical_smiles(df, 'L3')
 
+
     df['Ligands_Dict'] = df.apply(get_ligands_dict, axis=1)
     df['Ligands_Set'] = df.apply(lambda row: set([row['L1'], row['L2'], row['L3']]), axis=1)
+    # df['Mols_Set'] = df.apply(lambda row: set([row['MOL1'], row['MOL2'], row['MOL3']]), axis=1)
+    df['Ligands_Tuple'] = df.apply(lambda row: tuple(sorted([row['L1'], row['L2'], row['L3']])), axis=1)
+    df['Ligands_Sum'] = df.L1 + df.L2 + df.L3
 
     #AAB standardization
     df = swap_identical_ligands(df)
@@ -550,10 +537,6 @@ def prepare_df_rdkit(df_original, nbits=2048):
     df['MOL1'] = df.L1.apply(Chem.MolFromSmiles)
     df['MOL2'] = df.L2.apply(Chem.MolFromSmiles)
     df['MOL3'] = df.L3.apply(Chem.MolFromSmiles)
-    
-    df['Mols_Set'] = df.apply(lambda row: set([row['MOL1'], row['MOL2'], row['MOL3']]), axis=1)
-    df['Ligands_Tuple'] = df.apply(lambda row: tuple(sorted([row['L1'], row['L2'], row['L3']])), axis=1)
-
 
     df['RDKIT_1'] = df.MOL1.apply(lambda mol: get_rdkit_fp(mol, nbits))
     df['RDKIT_2'] = df.MOL2.apply(lambda mol: get_rdkit_fp(mol, nbits))
@@ -588,9 +571,9 @@ def prepare_input(df):
     df.reset_index(drop=True, inplace=True)
 
     #Making smiles canonical - this is only for data analysis purposes
-    df = canonical_smiles(df, 'L1')
-    df = canonical_smiles(df, 'L2')
-    df = canonical_smiles(df, 'L3')
+    canonical_smiles(df, 'L1')
+    canonical_smiles(df, 'L2')
+    canonical_smiles(df, 'L3')
 
     df['ID'] = df.index
 
@@ -808,53 +791,53 @@ def ligands_permutation(df):
 # Different Splittings 
 
 
-# def df_split(df, sizes=(0.9, 0.1), seed=0):
+def df_split(df, sizes=(0.9, 0.1), seed=0):
 
-#     """
-#     This function splits the dataset intro a train and a test set. It makes sure that all the permutations for the same complex
-#     are stored in the same set. 
+    """
+    This function splits the dataset intro a train and a test set. It makes sure that all the permutations for the same complex
+    are stored in the same set. 
     
-#     Args:
-#         df : dataframe 
+    Args:
+        df : dataframe 
     
-#     returns:
-#         train (list): list of indices of the train set
-#         test (list): list of indices of the test set
-#     """
+    returns:
+        train (list): list of indices of the train set
+        test (list): list of indices of the test set
+    """
 
-#     assert sum(sizes) == 1
+    assert sum(sizes) == 1
 
-#     ID = list(set(df.ID)) # We extract the unique IDs for each unique complex / each permutation group
+    ID = list(set(df.ID)) # We extract the unique IDs for each unique complex / each permutation group
 
-#     # Split
-#     train, val, test = [], [], []
+    # Split
+    train, val, test = [], [], []
 
-#     random.seed(seed)
-#     random.shuffle(ID) # Randomly shuffle unique IDs
-#     train_range = int(sizes[0] * len(ID))
-#     #val_range = int(sizes[1] * len(ID))
+    random.seed(seed)
+    random.shuffle(ID) # Randomly shuffle unique IDs
+    train_range = int(sizes[0] * len(ID))
+    #val_range = int(sizes[1] * len(ID))
 
-#     for i in range(train_range):
-#         selected = df[df['ID'] == ID[i]]
-#         indices = selected.index.tolist() # The absolute indices of these entries (which are consecutive in the dataframe) are added to the train set
-#         for i in indices:
-#             train.append(i)
+    for i in range(train_range):
+        selected = df[df['ID'] == ID[i]]
+        indices = selected.index.tolist() # The absolute indices of these entries (which are consecutive in the dataframe) are added to the train set
+        for i in indices:
+            train.append(i)
 
-#     #for i in range(train_range, train_range + val_range):
-#     #    selected = df[df['ID'] == ID[i]]
-#     #    indices = selected.index.tolist()
-#     #    for i in indices:
-#     #        val.append(i)
+    #for i in range(train_range, train_range + val_range):
+    #    selected = df[df['ID'] == ID[i]]
+    #    indices = selected.index.tolist()
+    #    for i in indices:
+    #        val.append(i)
 
-#     for i in range(train_range, len(ID)):
-#         selected = df[df['ID'] == ID[i]]
-#         indices = selected.index.tolist()
-#         for i in indices:
-#             test.append(i)
+    for i in range(train_range, len(ID)):
+        selected = df[df['ID'] == ID[i]]
+        indices = selected.index.tolist()
+        for i in indices:
+            test.append(i)
 
-#     print(f'train length : {len(train)} | test length : {len(test)}')
+    print(f'train length : {len(train)} | test length : {len(test)}')
 
-#     return train, test
+    return train, test
 
 
 # Cross Validation and Scaling the data 
@@ -1015,7 +998,7 @@ def cross_validation(df, indices, X, y, rf, descriptors=False, permutation=True)
 
 #         ffn = nn.RegressionFFN(output_transform=output_transform, 
 #         input_dim=mp.output_dim, 
-#         n_layers=2,
+#         n_layers=3,
 #         hidden_dim = 400,
 #         dropout=0.1)
 
@@ -1233,25 +1216,45 @@ def get_indices_chemeleon(df, CV=10, shuffle=False, random_state=42):
     
 #     return indices_final
 
-def get_indices_doi(df, CV):
+# def get_indices_doi(df, CV):
+#     gkf = GroupKFold(n_splits=CV)
+#     tr_te=[]
+    
+#     X = df.drop(columns=['pIC50'])
+#     X = X.sample(frac=1, random_state=42)
+#     groups = np.array(df['DOI'].tolist())
+#     y=None
+
+#     for fold, (tr, te) in enumerate(gkf.split(X, y, groups)):
+#         train_df = df.iloc[tr]
+#         test_df  = df.iloc[te]
+#         # check: no overlap in group ids
+#         assert set(train_df['DOI']).isdisjoint(set(test_df['DOI']))
+#         print(f"fold {fold} groups: train {train_df['DOI'].nunique()} test {test_df['DOI'].nunique()}")
+#         print(f"fold {fold} train set : {len(train_df)} | test set : {len(test_df)}")
+#         tr_te.append([train_df.index.tolist(), test_df.index.tolist()])
+#     return tr_te
+
+
+def get_indices_doi(df, CV, random_state=0):
     gkf = GroupKFold(n_splits=CV)
     tr_te=[]
     
-    X = df.drop(columns=['pIC50'])
-    X = X.sample(frac=1, random_state=42)
-    groups = np.array(df['DOI'].tolist())
-    y=None
+    X = df.drop(columns=['pIC50']).sample(frac=1, random_state=random_state)
+    groups = df.loc[X.index, 'DOI'].values  # aligned to shuffled order
 
-    for fold, (tr, te) in enumerate(gkf.split(X, y, groups)):
-        train_df = df.iloc[tr]
-        test_df  = df.iloc[te]
-        # check: no overlap in group ids
+    for fold, (tr, te) in enumerate(gkf.split(X, None, groups)):
+        train_idx = X.iloc[tr].index.tolist()
+        test_idx  = X.iloc[te].index.tolist()
+        
+        train_df = df.loc[train_idx]
+        test_df  = df.loc[test_idx]
+        
         assert set(train_df['DOI']).isdisjoint(set(test_df['DOI']))
         print(f"fold {fold} groups: train {train_df['DOI'].nunique()} test {test_df['DOI'].nunique()}")
         print(f"fold {fold} train set : {len(train_df)} | test set : {len(test_df)}")
-        tr_te.append([train_df.index.tolist(), test_df.index.tolist()])
+        tr_te.append([train_idx, test_idx])
     return tr_te
-
 
 def get_indices_chemeleon_DOI(df, CV, sizes=(0.9, 0.1), seeder=0):
 
@@ -1663,7 +1666,7 @@ def get_mean_distances_dataset(df, dataset, distance, desc = False):
             fingerprint = row['Descriptors']
             #we get the distance between a complexe to-be-tested and the entire dataset
             list_dist = get_distances(dataset, fingerprint, distance, desc = True)
-            if len(list_dist) !=0 :
+            if len(list) !=0 :
                 mean_distance = np.mean(list_dist) 
                 mean_distances.append(mean_distance)
         else : 

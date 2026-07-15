@@ -22,7 +22,8 @@ class RForest:
                                            max_features=max_features,
                                            min_samples_leaf=min_samples_leaf,
                                            random_state=seed,
-                                           n_jobs=16)
+                                           #n_jobs=16
+                                           )
         self.target_scaler = StandardScaler()
         self.train_scaler = StandardScaler()
 

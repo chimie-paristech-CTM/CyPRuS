@@ -413,6 +413,10 @@ def prepare_df_chemeleon(df_original):
     df = canonical_smiles(df, 'L2')
     df = canonical_smiles(df, 'L3')
 
+    # df['MOL1'] = df.L1.apply(Chem.MolFromSmiles)
+    # df['MOL2'] = df.L2.apply(Chem.MolFromSmiles)
+    # df['MOL3'] = df.L3.apply(Chem.MolFromSmiles)
+
     df['Ligands_Dict'] = df.apply(get_ligands_dict, axis=1)
     df['Ligands_Set'] = df.apply(lambda row: set([row['L1'], row['L2'], row['L3']]), axis=1)
 
@@ -1242,24 +1246,45 @@ def get_indices_chemeleon(df, CV=10, shuffle=False, random_state=42):
     
 #     return indices_final
 
-def get_indices_doi(df, CV):
+# def get_indices_doi(df, CV):
+#     gkf = GroupKFold(n_splits=CV)
+#     tr_te=[]
+    
+#     X = df.drop(columns=['pIC50'])
+#     X = X.sample(frac=1, random_state=42)
+#     groups = np.array(df['DOI'].tolist())
+#     y=None
+
+#     for fold, (tr, te) in enumerate(gkf.split(X, y, groups)):
+#         train_df = df.iloc[tr]
+#         test_df  = df.iloc[te]
+#         # check: no overlap in group ids
+#         assert set(train_df['DOI']).isdisjoint(set(test_df['DOI']))
+#         print(f"fold {fold} groups: train {train_df['DOI'].nunique()} test {test_df['DOI'].nunique()}")
+#         print(f"fold {fold} train set : {len(train_df)} | test set : {len(test_df)}")
+#         tr_te.append([train_df.index.tolist(), test_df.index.tolist()])
+#     return tr_te
+
+def get_indices_doi(df, CV, random_state=0):
     gkf = GroupKFold(n_splits=CV)
     tr_te=[]
     
-    X = df.drop(columns=['pIC50'])
-    X = X.sample(frac=1, random_state=42)
-    groups = np.array(df['DOI'].tolist())
-    y=None
+    X = df.drop(columns=['pIC50']).sample(frac=1, random_state=random_state)
+    groups = df.loc[X.index, 'DOI'].values  # aligned to shuffled order
 
-    for fold, (tr, te) in enumerate(gkf.split(X, y, groups)):
-        train_df = df.iloc[tr]
-        test_df  = df.iloc[te]
-        # check: no overlap in group ids
+    for fold, (tr, te) in enumerate(gkf.split(X, None, groups)):
+        train_idx = X.iloc[tr].index.tolist()
+        test_idx  = X.iloc[te].index.tolist()
+        
+        train_df = df.loc[train_idx]
+        test_df  = df.loc[test_idx]
+        
         assert set(train_df['DOI']).isdisjoint(set(test_df['DOI']))
         print(f"fold {fold} groups: train {train_df['DOI'].nunique()} test {test_df['DOI'].nunique()}")
         print(f"fold {fold} train set : {len(train_df)} | test set : {len(test_df)}")
-        tr_te.append([train_df.index.tolist(), test_df.index.tolist()])
+        tr_te.append([train_idx, test_idx])
     return tr_te
+
 
 def get_indices_chemeleon_DOI(df, CV, sizes=(0.9, 0.1), seeder=0):
 
@@ -1407,7 +1432,7 @@ def get_indices_chemeleon_scaff(mols_x, CV, sizes=(0.9, 0.1), seeder=0):
         val = []
 
         scaff_train_val = [s for s in scaffolds if s not in scaff_test[i]]
-        #random.shuffle(scaff_train_val)
+        random.shuffle(scaff_train_val)
 
         scaff_train, scaff_val = train_test_split(scaff_train_val, test_size=0.1, random_state=42)
 
