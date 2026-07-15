@@ -9,7 +9,7 @@ This work explores the use of predictive models to predict the cytotoxicity (aga
 ## Getting Started
 ### Setting up the environment
 #### General setup (regression models + RDKit descriptors, RDKit fingerprints, Morgan fingerprints)
-To set up the environment in order to run all the notebooks and scripts (with the exception of the CheMeleon_GNN folder's content):
+To set up the environment in order to run all the notebooks and scripts (with the exception of the CheMeleon folder's content):
 ```bash
 conda env create -f environment.yml
 ```
@@ -18,13 +18,21 @@ To activate the environment:
 conda activate ml_ruthenium_complexes
 ```
 #### Environment for the CheMeleon fingerprints and graph neural network
-To set up the environment for the CheMeleon graph neural network:
+To set up the environment for the CheMeleon fingerprints (CPU version):
 ```bash
-conda env create -f chemeleon.yml
-```
+conda env create -f chemeleon_ruthenium_complexes.yml
+
 To activate the environment:
 ```bash
-conda activate ML_Ru_CheMeleon
+conda activate chemeleon_ruthenium_complexes
+```
+To set up the environment for the CheMeleon graph neural network (GPU required):
+```bash
+conda env create -f chemeleon_gpu.yml
+
+To activate the environment:
+```bash
+conda activate chemeleon_gpu
 ```
 Please note: CheMeleon FPs can be computationally expensive to calculate, but should be accessible on your typical laptop. On the other hand, unless your local machine has a CUDA-compatible GPU, we recommend you run the CheMeleon GNN notebooks on a remote service providing GPU access, such as Google Colab.
 
@@ -45,13 +53,25 @@ python prediction.py --pool-file 'path/to/your_library.csv' --descriptors
 * If you want to use the Random Forest + RDKit fingerprints model:
 ```bash
 conda activate ml_ruthenium_complexes
+python prediction.py --pool-file 'path/to/your_library.csv --rdkitfp'
+```
+
+* If you want to use the Random Forest + Morgan fingerprints model:
+```bash
+conda activate ml_ruthenium_complexes
 python prediction.py --pool-file 'path/to/your_library.csv'
+```
+
+* If you want to use the Random Forest + CheMeleon fingerprints model:
+```bash
+conda activate chemeleon_ruthenium_complexes
+python prediction_chemeleon_fp.py --pool-file 'path/to/your_library.csv --chemeleonfp'
 ```
 
 * If you want to use the CheMeleon graph neural network:
 ```bash
-conda activate ML_Ru_CheMeleon
-python prediction_chemeleon.py --pool-file 'path/to/your_library.csv'
+conda activate chemeleon_gpu
+python prediction_chemeleon_gnn.py --test-file 'path/to/your_library.csv'
 ```
 
 ## Data availability
