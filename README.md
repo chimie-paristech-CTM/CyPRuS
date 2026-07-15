@@ -21,6 +21,7 @@ conda activate ml_ruthenium_complexes
 To set up the environment for the CheMeleon fingerprints (CPU version):
 ```bash
 conda env create -f chemeleon_ruthenium_complexes.yml
+```
 
 To activate the environment:
 ```bash
@@ -29,6 +30,7 @@ conda activate chemeleon_ruthenium_complexes
 To set up the environment for the CheMeleon graph neural network (GPU required):
 ```bash
 conda env create -f chemeleon_gpu.yml
+```
 
 To activate the environment:
 ```bash
@@ -53,7 +55,7 @@ python prediction.py --pool-file 'path/to/your_library.csv' --descriptors
 * If you want to use the Random Forest + RDKit fingerprints model:
 ```bash
 conda activate ml_ruthenium_complexes
-python prediction.py --pool-file 'path/to/your_library.csv --rdkitfp'
+python prediction.py --pool-file 'path/to/your_library.csv --rdkitfp
 ```
 
 * If you want to use the Random Forest + Morgan fingerprints model:
@@ -65,7 +67,7 @@ python prediction.py --pool-file 'path/to/your_library.csv'
 * If you want to use the Random Forest + CheMeleon fingerprints model:
 ```bash
 conda activate chemeleon_ruthenium_complexes
-python prediction_chemeleon_fp.py --pool-file 'path/to/your_library.csv --chemeleonfp'
+python prediction_chemeleon_fp.py --pool-file 'path/to/your_library.csv --chemeleonfp
 ```
 
 * If you want to use the CheMeleon graph neural network:
@@ -85,7 +87,7 @@ The ruthenium_complexes_dataset.csv file is a dataset of over 700 unique polypyr
 A first step for the project is to select the best combination of embedding and model. The search for the best combination is done through nested cross-validation, with random splitting.
 This work explores: 
 - 9 different encodings for the ligands: Morgan Fingerprints (rad=[2,3], nBits=[518, 1024, 2048]), RDKit Fingerprints, Molecular Descriptors and CheMeleon fingerprints. 
-- 4 different regression model architectures: RF, XGboost, KNN, MLP.
+- 3 different regression model architectures: RF, XGboost, KNN.
 - 1 graph neural network architecture: CheMeleon.
 The metric used to evaluate the models' performance is RMSE.
 To reproduce results, run main_model_fp_selection.py in the model_fp_selection folder after uncommenting the appropriate lines.
